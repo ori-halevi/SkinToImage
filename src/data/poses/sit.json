@@ -2,11 +2,42 @@
   "id": "sit",
   "category": "casual",
   "bones": {
-    "head": [4, -10, 0],
-    "body": [-4, 0, 0],
-    "rightArm": [-45, 0, -4],
-    "leftArm": [-45, 0, 4],
-    "rightLeg": [-90, 6, 0],
-    "leftLeg": [-90, -6, 0]
+    "head": [
+      4,
+      -10,
+      0
+    ],
+    "body": [
+      -4,
+      0,
+      0
+    ],
+    "rightArm": [
+      -45,
+      0,
+      -4
+    ],
+    "leftArm": [
+      -45,
+      0,
+      4
+    ],
+    "rightLeg": [
+      -90,
+      6,
+      0
+    ],
+    "leftLeg": [
+      -90,
+      -6,
+      0
+    ]
+  },
+  "root": {
+    "position": [
+      0,
+      -9.5,
+      0
+    ]
   }
 }

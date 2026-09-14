@@ -47,11 +47,38 @@ export function coverRect(imageW: number, imageH: number, frameW: number, frameH
 
 const backgroundImages = new Map<string, ImageBitmap>();
 
+const MAX_BACKGROUND_SIDE = 4096;
+
+/**
+ * Decodes an uploaded background (downscaled to at most 4096px on its long side) and makes it the
+ * only one kept in memory: a single background is used at a time, and phone photos are huge.
+ */
 export async function registerBackgroundImage(blob: Blob): Promise<string> {
-  const bitmap = await createImageBitmap(blob);
+  let bitmap = await createImageBitmap(blob);
+  const scale = MAX_BACKGROUND_SIDE / Math.max(bitmap.width, bitmap.height);
+  if (scale < 1) {
+    try {
+      const resized = await createImageBitmap(bitmap, {
+        resizeWidth: Math.round(bitmap.width * scale),
+        resizeHeight: Math.round(bitmap.height * scale),
+        resizeQuality: 'high',
+      });
+      bitmap.close();
+      bitmap = resized;
+    } catch {
+      // Resize options unsupported: keep the full-size image.
+    }
+  }
+  releaseBackgroundImages();
   const id = crypto.randomUUID();
   backgroundImages.set(id, bitmap);
   return id;
+}
+
+/** Frees decoded background images (call when the image background is no longer used). */
+export function releaseBackgroundImages(): void {
+  for (const bitmap of backgroundImages.values()) bitmap.close();
+  backgroundImages.clear();
 }
 
 export function hasBackgroundImage(id: string): boolean {

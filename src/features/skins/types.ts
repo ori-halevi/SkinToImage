@@ -11,7 +11,13 @@ export interface Skin {
   id: string;
   name: string;
   model: SkinModel;
+  /** Model guessed from the texture's pixels. */
   detectedModel: SkinModel;
+  /**
+   * The model "reset" returns to: the player profile's model for skins loaded by username
+   * (more reliable than pixels), otherwise the detected one.
+   */
+  defaultModel: SkinModel;
   /** Side length in pixels (64, 128, ...). */
   size: number;
   /** Original PNG, kept for persistence. */

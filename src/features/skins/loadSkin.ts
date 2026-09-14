@@ -11,7 +11,10 @@ export class SkinLoadError extends Error {
 
 export interface SkinOverrides {
   id?: string;
+  /** The user's chosen model (e.g. restored from recent skins). */
   model?: SkinModel;
+  /** Authoritative default model (e.g. from the player's profile); falls back to pixel detection. */
+  defaultModel?: SkinModel;
   overlay?: Partial<OverlayParts>;
   /** Convert legacy 64×32 skins instead of rejecting them (used for skins fetched by username). */
   upgradeLegacy?: boolean;
@@ -47,8 +50,9 @@ export async function loadSkinFromBlob(blob: Blob, name: string, overrides: Skin
   return {
     id: overrides.id ?? crypto.randomUUID(),
     name: sanitizeName(name.replace(/\.png$/i, '')) || 'skin',
-    model: overrides.model ?? detectedModel,
+    model: overrides.model ?? overrides.defaultModel ?? detectedModel,
     detectedModel,
+    defaultModel: overrides.defaultModel ?? detectedModel,
     size: bitmap.width,
     blob,
     bitmap,

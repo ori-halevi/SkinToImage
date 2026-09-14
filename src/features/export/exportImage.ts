@@ -4,7 +4,8 @@ export function downloadBlob(blob: Blob, filename: string): void {
   a.href = url;
   a.download = filename;
   a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // iOS Safari asks before downloading; the URL must outlive that prompt.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 export function canCopyImage(): boolean {

@@ -20,25 +20,44 @@ export function SkinSource() {
   const [username, setUsername] = useState('');
   const [loadingUser, setLoadingUser] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const mounted = useRef(true);
 
   useEffect(() => {
-    let cancelled = false;
-    void listRecentSkins().then((skins) => !cancelled && setRecent(skins));
+    mounted.current = true;
+    let loaded: Skin[] = [];
+    void listRecentSkins().then((skins) => {
+      loaded = skins;
+      if (mounted.current) setRecent(skins);
+      else skins.forEach((s) => s.bitmap.close());
+    });
     return () => {
-      cancelled = true;
+      mounted.current = false;
+      // Recent skins decode their images; release the ones the user didn't pick.
+      const inUse = new Set(useStudio.getState().skins.map((s) => s.bitmap));
+      for (const skin of loaded) if (!inUse.has(skin.bitmap)) skin.bitmap.close();
     };
   }, []);
+
+  /** Adds a skin unless this panel was closed while it was loading. */
+  const addIfOpen = useCallback(
+    (skin: Skin) => {
+      if (mounted.current) addSkin(skin);
+      else skin.bitmap.close();
+    },
+    [addSkin],
+  );
 
   const load = useCallback(
     async (blob: Blob, name: string) => {
       setError(null);
       try {
-        addSkin(await loadSkinFromBlob(blob, name));
+        addIfOpen(await loadSkinFromBlob(blob, name));
       } catch (e) {
+        if (!mounted.current) return;
         setError(e instanceof SkinLoadError ? t(`errors.${e.code}`, { max: MAX_SKIN_SIZE }) : t('errors.unknown'));
       }
     },
-    [addSkin, t],
+    [addIfOpen, t],
   );
 
   const loadUsername = async () => {
@@ -46,13 +65,14 @@ export function SkinSource() {
     setLoadingUser(true);
     try {
       const remote = await fetchSkinByUsername(username);
-      addSkin(await loadSkinFromBlob(remote.blob, `${remote.username}.png`, { model: remote.model, upgradeLegacy: true }));
+      addIfOpen(await loadSkinFromBlob(remote.blob, `${remote.username}.png`, { defaultModel: remote.model, upgradeLegacy: true }));
     } catch (e) {
+      if (!mounted.current) return;
       if (e instanceof UsernameSkinError) setError(t(`errors.${e.code}`));
       else if (e instanceof SkinLoadError) setError(t(`errors.${e.code}`, { max: MAX_SKIN_SIZE }));
       else setError(t('errors.unknown'));
     } finally {
-      setLoadingUser(false);
+      if (mounted.current) setLoadingUser(false);
     }
   };
 
@@ -163,7 +183,7 @@ export function SkinSource() {
                     setRecent((r) => r.filter((s) => s.id !== skin.id));
                   }}
                   aria-label={t('upload.remove', { name: skin.name })}
-                  className="absolute -inset-e-2 -top-2 hidden size-6 items-center justify-center rounded-full border border-edge bg-ink text-xs text-slate-300 group-hover:flex focus:flex hover:text-white [@media(hover:none)]:flex"
+                  className="absolute -inset-e-2 -top-2 flex size-6 items-center justify-center rounded-full border border-edge bg-ink text-xs text-slate-300 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:text-white focus:opacity-100 [@media(hover:none)]:opacity-100"
                 >
                   ✕
                 </button>

@@ -14,9 +14,21 @@ function keys(obj: object, prefix = ''): string[] {
 }
 
 /** Plural suffixes may differ between languages, so compare base keys. */
-const base = (k: string) => k.replace(/_(one|other|two|many)$/, '');
+const base = (k: string) => k.replace(/_(zero|one|two|few|many|other)$/, '');
 
 describe('translations', () => {
+  it.each([
+    ['en', en],
+    ['he', he],
+  ])('%s defines every plural form its language needs', (lang, dict) => {
+    const categories = new Intl.PluralRules(lang).resolvedOptions().pluralCategories;
+    const pluralBases = new Set(keys(dict).filter((k) => /_(zero|one|two|few|many|other)$/.test(k)).map(base));
+    for (const key of pluralBases) {
+      // i18next falls back to English (not "other") when a category is missing.
+      for (const category of categories) expect(keys(dict), `${lang}: ${key}_${category}`).toContain(`${key}_${category}`);
+    }
+  });
+
   it('en and he define the same keys', () => {
     expect([...new Set(keys(he).map(base))].sort()).toEqual([...new Set(keys(en).map(base))].sort());
   });

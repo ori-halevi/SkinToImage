@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CAMERAS } from '../../data/cameras';
 import { POSES } from '../../data/poses';
 import { getScene, SCENES } from '../../data/scenes';
-import { renderShot } from '../../render/renderShot';
+import { renderKey, renderShot } from '../../render/renderShot';
 import { useStudio } from '../../store/studio';
 import { buttonPrimary, buttonSecondary, Chips, useAnimatedDialog } from '../../ui/controls';
 import { canCopyImage, canShareFiles, copyImage, downloadBlob, shareImage } from '../export/exportImage';
@@ -20,10 +20,13 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
   const exportSize = useStudio((s) => s.exportSize);
   const setOpenShot = useStudio((s) => s.setOpenShot);
   const toggleSelected = useStudio((s) => s.toggleSelected);
-  const setCastSlot = useStudio((s) => s.setCastSlot);
+  const setSceneCast = useStudio((s) => s.setSceneCast);
   const selected = useStudio((s) => s.selection.includes(shotKey(shot)));
-  const [status, setStatus] = useState<string | null>(null);
+  // Status messages belong to the shot they were produced for, so navigating away hides them.
+  const [status, setStatus] = useState<{ key: string; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  /** Last full-size render, reused so Share can run inside the tap's user-activation window. */
+  const exportCache = useRef<{ key: string; blob: Blob } | null>(null);
 
   const spec = buildShot(shot, ctx, PREVIEW_SIZE);
   const { url, pending } = useRenderUrl(spec, 0);
@@ -33,28 +36,48 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
 
   const { requestClose, dialogProps } = useAnimatedDialog(() => setOpenShot(null));
 
-  useEffect(() => setStatus(null), [shot.kind, shot.id, shot.cameraId]);
-
   const ids = shot.kind === 'pose' ? POSES.map((p) => p.id) : SCENES.map((s) => s.id);
   const go = (delta: number) => {
     const index = ids.indexOf(shot.id);
     setOpenShot({ ...shot, id: ids[(index + delta + ids.length) % ids.length] });
   };
 
-  const renderExport = () => renderShot(buildShot(shot, ctx, exportSize)!);
+  const currentKey = shotKey(shot);
+  const exportSpec = buildShot(shot, ctx, exportSize)!;
+  const exportKey = renderKey(exportSpec);
+
+  const renderExport = async () => {
+    if (exportCache.current?.key === exportKey) return exportCache.current.blob;
+    const blob = await renderShot(exportSpec);
+    exportCache.current = { key: exportKey, blob };
+    return blob;
+  };
 
   const run = async (action: () => Promise<void>, done: string) => {
+    const key = currentKey;
     setBusy(true);
     setStatus(null);
     try {
       await action();
-      setStatus(done);
+      setStatus({ key, text: done });
     } catch (e) {
-      if ((e as Error).name !== 'AbortError') setStatus(t('errors.action'));
+      const name = (e as Error).name;
+      if (name === 'NotAllowedError') {
+        // Browsers only allow sharing shortly after a tap; the image is ready now, so a second tap works.
+        setStatus({ key, text: t('dialog.shareReady') });
+      } else if (name !== 'AbortError') {
+        setStatus({ key, text: t('errors.action') });
+      }
     } finally {
       setBusy(false);
     }
   };
+
+  const share = () =>
+    run(async () => {
+      const cached = exportCache.current?.key === exportKey ? exportCache.current.blob : null;
+      await shareImage(cached ?? (await renderExport()), filename);
+    }, t('dialog.shared'));
 
   return (
     <dialog
@@ -104,7 +127,12 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
                 <span className="text-slate-400">{t('dialog.slot', { n: i + 1 })}</span>
                 <select
                   value={castSkin.id}
-                  onChange={(e) => setCastSlot(scene.id, i, e.target.value, scene.slots.length)}
+                  onChange={(e) => {
+                    // Store the whole resolved cast so changing one slot never silently changes another.
+                    const ids = castForScene(scene, ctx).map((s) => s.id);
+                    ids[i] = e.target.value;
+                    setSceneCast(scene.id, ids);
+                  }}
                   className="rounded-md border border-edge bg-ink px-2 py-1"
                 >
                   {ctx.skins.map((s) => (
@@ -128,7 +156,7 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
             </button>
           )}
           {canShareFiles() && (
-            <button disabled={busy} className={buttonSecondary} onClick={() => run(async () => shareImage(await renderExport(), filename), t('dialog.shared'))}>
+            <button disabled={busy} className={buttonSecondary} onClick={share}>
               {t('dialog.share')}
             </button>
           )}
@@ -138,7 +166,7 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
           </label>
         </div>
         <span role="status" className="min-h-5 text-sm text-slate-400">
-          {busy ? t('dialog.rendering') : status}
+          {busy ? t('dialog.rendering') : status?.key === currentKey ? status.text : null}
         </span>
       </div>
     </dialog>

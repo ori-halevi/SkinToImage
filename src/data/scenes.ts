@@ -74,15 +74,18 @@ export const SCENES: Scene[] = [
   {
     id: 'treasure',
     slots: [
-      { poseId: 'pointSide', position: [-18, 0, 0], rotationY: 30 },
-      { poseId: 'shocked', position: [18, 0, 0], rotationY: -30 },
+      // The pointing (right) arm is on the character's -X side, so the pointer stands to the right of the chest.
+      { poseId: 'shocked', position: [-18, 0, 0], rotationY: 30 },
+      { poseId: 'pointSide', position: [18, 0, 0], rotationY: -30 },
     ],
     props: [{ propId: 'chest', position: [0, 0, 6], rotationY: 0 }],
   },
   {
     id: 'onChair',
-    slots: [{ poseId: 'sit', position: [0, 0, 0], rotationY: 0 }],
-    props: [{ propId: 'chair', position: [0, 0, 0] }],
+    // `sit` rests its legs at y=0; lift the character so the legs lie on the seat (top at y=12),
+    // and push the chair back so the leaning head clears the backrest.
+    slots: [{ poseId: 'sit', position: [0, 12, 0], rotationY: 0 }],
+    props: [{ propId: 'chair', position: [0, 0, -2] }],
   },
   {
     id: 'kingOfTheHill',
@@ -115,8 +118,8 @@ export const SCENES: Scene[] = [
   {
     id: 'campfire',
     slots: [
-      { poseId: 'sitGround', position: [-16, 0, 0], rotationY: 60 },
-      { poseId: 'sitGround', position: [16, 0, 0], rotationY: -60 },
+      { poseId: 'sitGround', position: [-24, 0, 0], rotationY: 60 },
+      { poseId: 'sitGround', position: [24, 0, 0], rotationY: -60 },
     ],
     props: [{ propId: 'planks', position: [0, 0, 6] }],
   },

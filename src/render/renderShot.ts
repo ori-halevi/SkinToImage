@@ -1,16 +1,16 @@
-import { AmbientLight, DirectionalLight, Group, MathUtils, Mesh, PerspectiveCamera, Scene, Vector3 } from 'three';
+import { AmbientLight, DirectionalLight, Group, MathUtils, Mesh, PerspectiveCamera, Scene, Vector3, type Object3D } from 'three';
 import type { CameraPreset } from '../data/cameras';
 import type { Pose } from '../data/poses/types';
 import type { ScenePropPlacement } from '../data/scenes';
 import type { Skin } from '../features/skins/types';
 import { fitCamera, presetDirection } from './camera';
-import { applyShadowAndGlow, mirrorCanvas, type GlowSettings, type ShadowSettings } from './postprocess/effects';
+import { applyShadowAndGlow, mirrorCanvas, releaseCanvas, type GlowSettings, type ShadowSettings } from './postprocess/effects';
 import { composeFrame, type Background, type FrameId } from './postprocess/frame';
 import { applyOutline } from './postprocess/outline';
 import { findAlphaBounds, padRect } from './postprocess/trim';
 import type { ItemId } from './props/items';
 import { BLOCK_SIZE, createPropObject } from './props/meshes';
-import { enqueueRender, getRenderer } from './renderer';
+import { abortError, enqueueRender, getRenderer } from './renderer';
 import type { Vec3 } from './rig/layout';
 import { Character, type HeldItems, type Lighting } from './rig/character';
 
@@ -56,7 +56,7 @@ export interface RenderRequest extends ShotSpec {
 const REFERENCE_SIZE = 2048;
 
 /** Key light above-left of the camera plus a soft fill, so shading looks the same from every angle. */
-export function addLights(scene: Scene, cameraDirection: Vector3): void {
+export function addLights(scene: Object3D, cameraDirection: Vector3): void {
   scene.add(new AmbientLight(0xffffff, 1.6));
   const key = new DirectionalLight(0xffffff, 2.2);
   key.position.copy(cameraDirection).applyAxisAngle(new Vector3(0, 1, 0), -0.7).add(new Vector3(0, 0.8, 0));
@@ -117,17 +117,40 @@ export function renderShot(request: RenderRequest): Promise<Blob> {
 
 const URL_CACHE_LIMIT = 250;
 const urlCache = new Map<string, string>();
+/**
+ * Renders already queued or running, so identical requests share one render (and one URL).
+ * The shared render is cancelled only once every caller that passed a signal has aborted.
+ */
+const inFlight = new Map<string, { promise: Promise<string>; controller: AbortController; waiters: number }>();
 
 /** Renders (or reuses) an image and returns an object URL. Cached URLs stay valid until evicted. */
-export async function renderShotUrl(request: RenderRequest): Promise<string> {
+export function renderShotUrl(request: RenderRequest): Promise<string> {
   const key = renderKey(request);
   const hit = urlCache.get(key);
   if (hit) {
     urlCache.delete(key);
     urlCache.set(key, hit); // mark as recently used
-    return hit;
+    return Promise.resolve(hit);
   }
-  const url = URL.createObjectURL(await renderShot(request));
+  if (request.signal?.aborted) return Promise.reject(abortError());
+
+  let flight = inFlight.get(key);
+  if (!flight) {
+    const controller = new AbortController();
+    const promise = renderShot({ ...request, signal: controller.signal })
+      .then((blob) => cacheUrl(key, URL.createObjectURL(blob)))
+      .finally(() => inFlight.delete(key));
+    flight = { promise, controller, waiters: 0 };
+    inFlight.set(key, flight);
+  }
+
+  const shared = flight;
+  shared.waiters++;
+  request.signal?.addEventListener('abort', () => --shared.waiters === 0 && shared.controller.abort(), { once: true });
+  return shared.promise;
+}
+
+function cacheUrl(key: string, url: string): string {
   urlCache.set(key, url);
   if (urlCache.size > URL_CACHE_LIMIT) {
     const [oldestKey, oldestUrl] = urlCache.entries().next().value!;
@@ -213,6 +236,7 @@ async function renderShotNow({ actors, props = [], camera: preset, settings, siz
 
   const canvas = new OffscreenCanvas(size, size);
   const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+  // (Released below once cropped; large intermediate canvases add up quickly on iOS.)
   ctx.drawImage(renderer.domElement, 0, 0);
   const image = ctx.getImageData(0, 0, size, size);
 
@@ -226,10 +250,15 @@ async function renderShotNow({ actors, props = [], camera: preset, settings, siz
   const crop = padRect(bounds, padding, size, size);
   let result = new OffscreenCanvas(crop.width, crop.height);
   result.getContext('2d')!.drawImage(canvas, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
+  releaseCanvas(canvas);
 
-  result = applyShadowAndGlow(result, settings.shadow, settings.glow, scale);
+  // Mirror first so the drop shadow keeps its down-right direction.
   if (settings.mirror) result = mirrorCanvas(result);
-  result = composeFrame(result, settings.background, settings.frame, size);
+  result = applyShadowAndGlow(result, settings.shadow, settings.glow, scale);
+  const framed = composeFrame(result, settings.background, settings.frame, size);
+  if (framed !== result) releaseCanvas(result);
 
-  return result.convertToBlob({ type: 'image/png' });
+  const blob = await framed.convertToBlob({ type: 'image/png' });
+  releaseCanvas(framed);
+  return blob;
 }

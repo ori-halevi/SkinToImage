@@ -5,7 +5,11 @@ import type { PoseCategory } from '../data/poses/types';
 import { saveRecentSkin } from '../features/skins/recentSkins';
 import type { Skin } from '../features/skins/types';
 import { shotKey, type ShotKind, type ShotRef } from '../features/studio/shots';
+import { releaseBackgroundImages } from '../render/postprocess/frame';
 import { forgetSkin, type RenderSettings } from '../render/renderShot';
+import { DEFAULT_SETTINGS, sanitizeCameraId, sanitizeOneOf, sanitizeSettings } from './sanitize';
+
+export { DEFAULT_SETTINGS };
 
 export const EXPORT_SIZES = [1024, 2048, 4096] as const;
 export type ExportSize = (typeof EXPORT_SIZES)[number];
@@ -35,7 +39,8 @@ interface StudioState {
   clearSkins: () => void;
   setActiveSkin: (id: string) => void;
   updateSkin: (id: string, patch: SkinPatch) => void;
-  setCastSlot: (sceneId: string, slot: number, skinId: string, slotCount: number) => void;
+  /** Stores the full cast (skin id per slot) for a scene. */
+  setSceneCast: (sceneId: string, skinIds: string[]) => void;
   updateSettings: (patch: Partial<RenderSettings>) => void;
   resetSettings: () => void;
   setCamera: (cameraId: CameraId) => void;
@@ -48,18 +53,6 @@ interface StudioState {
   setAddSkinOpen: (open: boolean) => void;
 }
 
-export const DEFAULT_SETTINGS: RenderSettings = {
-  lighting: 'shaded',
-  bigHead: 1,
-  outline: { enabled: true, width: 16, color: '#ffffff' },
-  shadow: { enabled: false, opacity: 0.45, blur: 24, distance: 24 },
-  glow: { enabled: false, color: '#ffd54a', size: 40 },
-  mirror: false,
-  ground: 'none',
-  heldItem: 'none',
-  background: { type: 'transparent' },
-  frame: 'fit',
-};
 
 export const useStudio = create<StudioState>()(
   persist(
@@ -79,9 +72,10 @@ export const useStudio = create<StudioState>()(
       addSkin: (skin) => {
         void saveRecentSkin(skin);
         set((s) => {
-          const others = s.skins.filter((k) => k.id !== skin.id);
-          const skins = [...others, skin].slice(-MAX_ACTIVE_SKINS);
-          return { skins, activeSkinId: skin.id, addSkinOpen: false };
+          const all = [...s.skins.filter((k) => k.id !== skin.id), skin];
+          // Over the limit: the oldest skins make room (and free their cached 3D models).
+          for (const evicted of all.slice(0, -MAX_ACTIVE_SKINS)) forgetSkin(evicted.id);
+          return { skins: all.slice(-MAX_ACTIVE_SKINS), activeSkinId: skin.id, addSkinOpen: false };
         });
       },
       removeSkin: (id) => {
@@ -92,7 +86,10 @@ export const useStudio = create<StudioState>()(
           return { skins, activeSkinId, selection: skins.length ? s.selection : [], openShot: skins.length ? s.openShot : null };
         });
       },
-      clearSkins: () => set({ skins: [], activeSkinId: null, selection: [], openShot: null }),
+      clearSkins: () => {
+        for (const skin of get().skins) forgetSkin(skin.id);
+        set({ skins: [], activeSkinId: null, selection: [], openShot: null });
+      },
       setActiveSkin: (activeSkinId) => set({ activeSkinId }),
       updateSkin: (id, patch) => {
         const skin = get().skins.find((k) => k.id === id);
@@ -101,15 +98,16 @@ export const useStudio = create<StudioState>()(
         void saveRecentSkin(next);
         set((s) => ({ skins: s.skins.map((k) => (k.id === id ? next : k)) }));
       },
-      setCastSlot: (sceneId, slot, skinId, slotCount) =>
-        set((s) => {
-          const current = [...(s.sceneCast[sceneId] ?? [])];
-          current.length = Math.max(current.length, slotCount);
-          current[slot] = skinId;
-          return { sceneCast: { ...s.sceneCast, [sceneId]: current } };
-        }),
-      updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
-      resetSettings: () => set({ settings: DEFAULT_SETTINGS, cameraId: DEFAULT_CAMERA_ID, exportSize: DEFAULT_EXPORT_SIZE }),
+      setSceneCast: (sceneId, skinIds) => set((s) => ({ sceneCast: { ...s.sceneCast, [sceneId]: skinIds } })),
+      updateSettings: (patch) => {
+        // Leaving the image background frees the decoded photo.
+        if (patch.background && patch.background.type !== 'image') releaseBackgroundImages();
+        set((s) => ({ settings: { ...s.settings, ...patch } }));
+      },
+      resetSettings: () => {
+        releaseBackgroundImages();
+        set({ settings: DEFAULT_SETTINGS, cameraId: DEFAULT_CAMERA_ID, exportSize: DEFAULT_EXPORT_SIZE });
+      },
       setCamera: (cameraId) => set({ cameraId }),
       setExportSize: (exportSize) => set({ exportSize }),
       setMode: (mode) => set({ mode }),
@@ -133,14 +131,15 @@ export const useStudio = create<StudioState>()(
         cameraId: s.cameraId,
         exportSize: s.exportSize,
       }),
-      // Older saved settings may lack newer fields; layer them over the defaults.
       migrate: (persisted) => persisted as Partial<StudioState>,
+      // Saved data may come from older versions: validate every field instead of trusting it.
       merge: (persisted, current) => {
-        const p = (persisted ?? {}) as Partial<StudioState>;
+        const p = (persisted ?? {}) as Partial<Record<'settings' | 'cameraId' | 'exportSize', unknown>>;
         return {
           ...current,
-          ...p,
-          settings: { ...DEFAULT_SETTINGS, ...p.settings },
+          settings: sanitizeSettings(p.settings),
+          cameraId: sanitizeCameraId(p.cameraId, DEFAULT_CAMERA_ID),
+          exportSize: sanitizeOneOf(p.exportSize, EXPORT_SIZES, DEFAULT_EXPORT_SIZE),
         };
       },
     },

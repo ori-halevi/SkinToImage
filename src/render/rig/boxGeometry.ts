@@ -15,6 +15,9 @@ const FACES: Record<FaceId, { corners: [Vec3, Vec3, Vec3, Vec3]; normal: Vec3 }>
   bottom: { normal: [0, -1, 0], corners: [[-1, -1, 1], [1, -1, 1], [1, -1, -1], [-1, -1, -1]] },
 };
 
+/** Texels to shrink each face's UV rect by on every side. */
+const UV_INSET = 0.02;
+
 /**
  * Builds a box whose faces sample the skin texture's UV net.
  * UVs are normalized to 64px units, so HD skins (128, 256...) map identically.
@@ -30,7 +33,13 @@ export function createSkinBoxGeometry(size: Vec3, uv: [number, number], inflate 
 
   for (const faceId of Object.keys(FACES) as FaceId[]) {
     const { corners, normal } = FACES[faceId];
-    const [x, y, w, h] = rects[faceId];
+    // Inset a hair: anti-aliased edge pixels sample at their center, which can fall just outside
+    // the face and pick up the neighboring texel in the UV net (often black), drawing dark seams.
+    const [rx, ry, rw, rh] = rects[faceId];
+    const x = rx + UV_INSET;
+    const y = ry + UV_INSET;
+    const w = rw - 2 * UV_INSET;
+    const h = rh - 2 * UV_INSET;
     const faceUvs = [
       [x, y + h],
       [x + w, y + h],

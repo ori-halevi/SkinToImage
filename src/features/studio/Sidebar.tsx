@@ -57,7 +57,7 @@ export function Sidebar({ skin }: { skin: Skin }) {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const skinChanged = skin.model !== skin.detectedModel || !same(skin.overlay, ALL_OVERLAY_PARTS);
+  const skinChanged = skin.model !== skin.defaultModel || !same(skin.overlay, ALL_OVERLAY_PARTS);
   const characterReset = resetKeys('heldItem', 'bigHead');
   const cameraChanged = cameraId !== DEFAULT_CAMERA_ID || settings.mirror !== DEFAULT_SETTINGS.mirror;
   const anythingChanged = !same(settings, DEFAULT_SETTINGS) || cameraId !== DEFAULT_CAMERA_ID || exportSize !== DEFAULT_EXPORT_SIZE;
@@ -91,7 +91,7 @@ export function Sidebar({ skin }: { skin: Skin }) {
             onReset={
               skinChanged || characterReset
                 ? () => {
-                    updateSkin(skin.id, { model: skin.detectedModel, overlay: ALL_OVERLAY_PARTS });
+                    updateSkin(skin.id, { model: skin.defaultModel, overlay: ALL_OVERLAY_PARTS });
                     characterReset?.();
                   }
                 : undefined
@@ -102,8 +102,8 @@ export function Sidebar({ skin }: { skin: Skin }) {
             </div>
             <Field
               label={t('studio.armModel')}
-              hint={t('studio.detected', { model: t(`studio.${skin.detectedModel}`) })}
-              onReset={resetIf(skin.model, skin.detectedModel, () => updateSkin(skin.id, { model: skin.detectedModel }))}
+              hint={t('studio.detected', { model: t(`studio.${skin.defaultModel}`) })}
+              onReset={resetIf(skin.model, skin.defaultModel, () => updateSkin(skin.id, { model: skin.defaultModel }))}
             >
               <Segmented
                 label={t('studio.armModel')}
@@ -237,7 +237,7 @@ function SkinsBar({ activeSkin }: { activeSkin: Skin }) {
             <button
               onClick={() => removeSkin(skin.id)}
               aria-label={t('studio.removeSkin', { name: skin.name })}
-              className="absolute -inset-e-1.5 -top-1.5 hidden size-5 items-center justify-center rounded-full border border-edge bg-ink text-[10px] text-slate-300 group-hover:flex focus:flex hover:text-white [@media(hover:none)]:flex"
+              className="absolute -inset-e-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full border border-edge bg-ink text-[10px] text-slate-300 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:text-white focus:opacity-100 [@media(hover:none)]:opacity-100"
             >
               ✕
             </button>

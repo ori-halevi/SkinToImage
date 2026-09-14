@@ -9,6 +9,7 @@ const skin = (id: string): Skin => ({
   name: id,
   model: 'classic',
   detectedModel: 'classic',
+  defaultModel: 'classic',
   size: 64,
   blob: new Blob(),
   bitmap: {} as ImageBitmap,

@@ -41,7 +41,13 @@ test('sample skin → gallery → ZIP download', async ({ page }) => {
 
   const files = unzipSync(await readDownload(download));
   expect(Object.keys(files).sort()).toEqual(['explorer_dab_left.png', 'explorer_wave_left.png']);
-  for (const data of Object.values(files)) expect(Array.from(data.slice(0, 4))).toEqual(PNG_SIGNATURE);
+  for (const data of Object.values(files)) {
+    expect(Array.from(data.slice(0, 4))).toEqual(PNG_SIGNATURE);
+    // A real render: a trimmed character is several hundred pixels tall at 1024px, never a blank sliver.
+    const [width, height] = pngSize(data);
+    expect(height).toBeGreaterThan(400);
+    expect(width).toBeGreaterThan(150);
+  }
 });
 
 test('single image download from the dialog', async ({ page }) => {
@@ -88,6 +94,10 @@ test('scenes with two skins', async ({ page }) => {
   await expect(dialog.getByText('Characters')).toBeVisible();
   const [download] = await Promise.all([page.waitForEvent('download'), dialog.getByRole('button', { name: 'Download PNG' }).click()]);
   expect(download.suggestedFilename()).toBe('explorer_fight_left.png');
+  const [width, height] = pngSize(await readDownload(download));
+  // A real 2048px render of two characters, not a blank or single-character image.
+  expect(width).toBeGreaterThan(900);
+  expect(height).toBeGreaterThan(900);
 });
 
 test('loads a skin by username (mocked services)', async ({ page }) => {

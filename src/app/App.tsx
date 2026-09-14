@@ -1,16 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES, setLanguage, type LanguageCode } from '../i18n';
 import { isWebGL2Supported } from '../render/renderer';
 import { useActiveSkin, useStudio } from '../store/studio';
 import { UploadPanel } from '../features/skins/UploadPanel';
 import { Studio } from '../features/studio/Studio';
+import { UpdatePrompt } from './UpdatePrompt';
 
 export default function App() {
   const { t, i18n } = useTranslation();
   const skin = useActiveSkin();
   const clearSkins = useStudio((s) => s.clearSkins);
   const [webgl] = useState(isWebGL2Supported);
+
+  useEffect(() => {
+    const prevent = (e: DragEvent) => {
+      if (e.dataTransfer?.types.includes('Files')) e.preventDefault();
+    };
+    window.addEventListener('dragover', prevent);
+    window.addEventListener('drop', prevent);
+    return () => {
+      window.removeEventListener('dragover', prevent);
+      window.removeEventListener('drop', prevent);
+    };
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -50,6 +63,7 @@ export default function App() {
       </main>
 
       <footer className="border-t border-edge px-4 py-3 text-center text-xs text-slate-500">{t('app.disclaimer')}</footer>
+      <UpdatePrompt />
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import { findAlphaBounds, padRect } from './trim';
 
 export interface ShadowSettings {
   enabled: boolean;
@@ -30,9 +29,18 @@ function drawShadowOnly(ctx: OffscreenCanvasRenderingContext2D, image: Offscreen
   ctx.restore();
 }
 
+/** Stay under iOS Safari's per-canvas limit (16,777,216 px). */
+const MAX_CANVAS_PIXELS = 16_000_000;
+
+/** Frees a canvas's backing memory now instead of waiting for GC (matters on iOS). */
+export function releaseCanvas(canvas: OffscreenCanvas): void {
+  canvas.width = 0;
+  canvas.height = 0;
+}
+
 /**
- * Adds a glow and/or drop shadow behind the image, growing the canvas as needed
- * and trimming it back to the visible result. Values are scaled by `scale`.
+ * Adds a glow and/or drop shadow behind the image and crops to where they can reach.
+ * Values are scaled by `scale`. Consumes `image` (its memory is released).
  */
 export function applyShadowAndGlow(image: OffscreenCanvas, shadow: ShadowSettings, glow: GlowSettings, scale: number): OffscreenCanvas {
   if (!shadow.enabled && !glow.enabled) return image;
@@ -40,10 +48,15 @@ export function applyShadowAndGlow(image: OffscreenCanvas, shadow: ShadowSetting
   const blur = shadow.blur * scale;
   const distance = shadow.distance * scale;
   const glowSize = glow.size * scale;
-  const pad = Math.ceil(Math.max(shadow.enabled ? blur * 2 + distance : 0, glow.enabled ? glowSize * 2 : 0)) + 2;
+  // A canvas shadow with shadowBlur b fades out at roughly 1.5·b from the shape.
+  const reachBefore = Math.max(shadow.enabled ? blur * 1.5 - distance : 0, glow.enabled ? glowSize * 1.5 : 0, 0);
+  const reachAfter = Math.max(shadow.enabled ? blur * 1.5 + distance : 0, glow.enabled ? glowSize * 1.5 : 0);
+
+  let pad = Math.ceil(Math.max(reachBefore, reachAfter)) + 2;
+  while (pad > 2 && (image.width + pad * 2) * (image.height + pad * 2) > MAX_CANVAS_PIXELS) pad = Math.floor(pad * 0.8);
 
   const canvas = new OffscreenCanvas(image.width + pad * 2, image.height + pad * 2);
-  const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+  const ctx = canvas.getContext('2d')!;
 
   if (shadow.enabled) {
     drawShadowOnly(ctx, image, pad, pad, `rgba(0,0,0,${shadow.opacity})`, blur, distance, distance);
@@ -54,12 +67,15 @@ export function applyShadowAndGlow(image: OffscreenCanvas, shadow: ShadowSetting
   }
   ctx.drawImage(image, pad, pad);
 
-  const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const bounds = findAlphaBounds(data, 2);
-  if (!bounds) return canvas;
-  const crop = padRect(bounds, Math.max(2, Math.round(8 * scale)), canvas.width, canvas.height);
-  const out = new OffscreenCanvas(crop.width, crop.height);
-  out.getContext('2d')!.drawImage(canvas, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
+  const x = Math.max(0, Math.floor(pad - reachBefore));
+  const y = x;
+  const right = Math.min(canvas.width, Math.ceil(pad + image.width + reachAfter));
+  const bottom = Math.min(canvas.height, Math.ceil(pad + image.height + reachAfter));
+  releaseCanvas(image);
+
+  const out = new OffscreenCanvas(right - x, bottom - y);
+  out.getContext('2d')!.drawImage(canvas, x, y, out.width, out.height, 0, 0, out.width, out.height);
+  releaseCanvas(canvas);
   return out;
 }
 
@@ -69,5 +85,6 @@ export function mirrorCanvas(image: OffscreenCanvas): OffscreenCanvas {
   ctx.translate(image.width, 0);
   ctx.scale(-1, 1);
   ctx.drawImage(image, 0, 0);
+  releaseCanvas(image);
   return out;
 }

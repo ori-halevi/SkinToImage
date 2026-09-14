@@ -7,7 +7,7 @@ const INF = 1e20;
  * 1D squared Euclidean distance transform (Felzenszwalb & Huttenlocher).
  * Reads f[offset + i*stride] for i < n and writes the result back in place.
  */
-function edt1d(f: Float64Array, offset: number, stride: number, n: number, d: Float64Array, v: Int32Array, z: Float64Array) {
+function edt1d(f: Float32Array, offset: number, stride: number, n: number, d: Float32Array, v: Int32Array, z: Float64Array) {
   let k = 0;
   v[0] = 0;
   z[0] = -INF;
@@ -33,18 +33,24 @@ function edt1d(f: Float64Array, offset: number, stride: number, n: number, d: Fl
   for (let q = 0; q < n; q++) f[offset + q * stride] = d[q];
 }
 
-/** Squared distance from each pixel to the nearest pixel where `inside` is true. */
-export function squaredDistanceField(inside: Uint8Array, width: number, height: number): Float64Array {
-  const f = new Float64Array(width * height);
-  for (let i = 0; i < f.length; i++) f[i] = inside[i] ? 0 : INF;
-
+/**
+ * Squared distance from each pixel to the nearest pixel whose mask value equals `target`, written into `out`.
+ * Float32 keeps a 4096² field at 64 MB (distances stay exact well past any outline radius).
+ */
+function distanceField(mask: Uint8Array, width: number, height: number, target: 0 | 1, out: Float32Array): Float32Array {
+  for (let i = 0; i < out.length; i++) out[i] = mask[i] === target ? 0 : INF;
   const n = Math.max(width, height);
-  const d = new Float64Array(n);
+  const d = new Float32Array(n);
   const v = new Int32Array(n);
   const z = new Float64Array(n + 1);
-  for (let x = 0; x < width; x++) edt1d(f, x, width, height, d, v, z);
-  for (let y = 0; y < height; y++) edt1d(f, y * width, 1, width, d, v, z);
-  return f;
+  for (let x = 0; x < width; x++) edt1d(out, x, width, height, d, v, z);
+  for (let y = 0; y < height; y++) edt1d(out, y * width, 1, width, d, v, z);
+  return out;
+}
+
+/** Squared distance from each pixel to the nearest pixel where `inside` is true. */
+export function squaredDistanceField(inside: Uint8Array, width: number, height: number): Float32Array {
+  return distanceField(inside, width, height, 1, new Float32Array(width * height));
 }
 
 export function hexToRgb(hex: string): [number, number, number] {
@@ -73,25 +79,23 @@ export function applyOutline(image: PixelBuffer, radius: number, color: string, 
     }
   }
 
-  // Morphological opening: erode by `smoothing` here, then dilate by radius + smoothing below.
-  let source = mask;
+  // One float buffer is reused for both passes to keep peak memory low on large renders.
+  const field = new Float32Array(mask.length);
+
+  // Morphological opening: erode by `smoothing` here (in place), then dilate by radius + smoothing below.
   if (smoothing > 0) {
-    const outside = new Uint8Array(mask.length);
-    for (let i = 0; i < mask.length; i++) outside[i] = 1 - mask[i];
-    const toOutside = squaredDistanceField(outside, region.width, region.height);
-    const eroded = new Uint8Array(mask.length);
-    let any = false;
-    for (let i = 0; i < mask.length; i++) {
-      if (toOutside[i] > smoothing * smoothing) {
-        eroded[i] = 1;
-        any = true;
-      }
+    distanceField(mask, region.width, region.height, 0, field);
+    const limit = smoothing * smoothing;
+    let survivors = 0;
+    for (let i = 0; i < mask.length; i++) if (mask[i] && field[i] > limit) survivors++;
+    if (survivors > 0) {
+      for (let i = 0; i < mask.length; i++) mask[i] = mask[i] && field[i] > limit ? 1 : 0;
+    } else {
+      smoothing = 0; // everything is thinner than the smoothing size; outline it as-is
     }
-    if (any) source = eroded;
-    else smoothing = 0;
   }
 
-  const dist2 = squaredDistanceField(source, region.width, region.height);
+  const dist2 = distanceField(mask, region.width, region.height, 1, field);
   const reach = radius + smoothing + 0.5;
   const [r, g, b] = hexToRgb(color);
 

@@ -1,5 +1,5 @@
 import { createStore, del, entries, set } from 'idb-keyval';
-import { loadSkinFromBlob } from './loadSkin';
+import { loadSkinFromBlob, SkinLoadError } from './loadSkin';
 import type { OverlayParts, Skin, SkinModel } from './types';
 
 export const MAX_RECENT_SKINS = 10;
@@ -10,6 +10,7 @@ interface StoredSkin {
   id: string;
   name: string;
   model: SkinModel;
+  defaultModel?: SkinModel;
   overlay?: OverlayParts;
   /** Saved by older versions, before per-part layers. */
   showOverlay?: boolean;
@@ -30,11 +31,13 @@ export async function listRecentSkins(): Promise<Skin[]> {
           const skin = await loadSkinFromBlob(s.blob, s.name, {
             id: s.id,
             model: s.model,
+            defaultModel: s.defaultModel,
             overlay: s.overlay ?? (s.showOverlay === false ? NO_OVERLAY : undefined),
           });
           return { ...skin, lastUsedAt: s.lastUsedAt };
-        } catch {
-          await del(s.id, store);
+        } catch (e) {
+          // A transient failure (e.g. memory pressure on mobile) shouldn't erase the user's skin.
+          if (e instanceof SkinLoadError) await del(s.id, store);
           return null;
         }
       }),
@@ -51,6 +54,7 @@ export async function saveRecentSkin(skin: Skin): Promise<void> {
       id: skin.id,
       name: skin.name,
       model: skin.model,
+      defaultModel: skin.defaultModel,
       overlay: skin.overlay,
       blob: skin.blob,
       lastUsedAt: skin.lastUsedAt,

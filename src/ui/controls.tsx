@@ -318,10 +318,9 @@ export function useAnimatedDialog(onClosed: () => void) {
     const dialog = ref.current!;
     if (!dialog.open) dialog.showModal();
     const frame = requestAnimationFrame(() => setShown(true));
-    return () => {
-      cancelAnimationFrame(frame);
-      dialog.close();
-    };
+    // No dialog.close() here: under StrictMode the effect re-runs, and a queued `close` event would
+    // then close the freshly re-opened dialog. Unmounting removes the element, which closes it silently.
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const requestClose = () => {

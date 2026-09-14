@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CameraId } from '../../data/cameras';
 import { POSE_CATEGORIES, POSES } from '../../data/poses';
@@ -140,6 +140,9 @@ function SelectionBar({ skin, visible }: { skin: Skin; visible: ShotRef[] }) {
   const [error, setError] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
 
+  // Leaving the studio cancels an export in progress.
+  useEffect(() => () => controllerRef.current?.abort(), []);
+
   const downloadZip = async (shots: ShotRef[]) => {
     const controller = new AbortController();
     controllerRef.current = controller;
@@ -154,6 +157,7 @@ function SelectionBar({ skin, visible }: { skin: Skin; visible: ShotRef[] }) {
         entries.push({ filename: shotFilename(shot, ctx), data: new Uint8Array(await blob.arrayBuffer()) });
         setProgress({ done: i + 1, total: shots.length });
       }
+      if (controller.signal.aborted) return;
       downloadBlob(buildZip(entries), `${skin.name}_images.zip`);
     } catch (e) {
       if (!isAbortError(e)) {

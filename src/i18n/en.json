@@ -2,7 +2,10 @@
   "app": {
     "privacy": "Your skin never leaves your device",
     "disclaimer": "Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.",
-    "language": "Language"
+    "language": "Language",
+    "updateReady": "A new version is available.",
+    "updateNow": "Update",
+    "updateLater": "Later"
   },
   "upload": {
     "title": "Turn your skin into thumbnail-ready renders",
@@ -121,7 +124,8 @@
     "previous": "Previous pose",
     "next": "Next pose",
     "cast": "Characters",
-    "slot": "Character {{n}}"
+    "slot": "Character {{n}}",
+    "shareReady": "Image ready. Tap Share again."
   },
   "poses": {
     "wave": "Wave",

@@ -23,10 +23,25 @@ export function getRenderer(): WebGLRenderer {
 
 export function isWebGL2Supported(): boolean {
   try {
-    return !!document.createElement('canvas').getContext('webgl2');
+    const gl = document.createElement('canvas').getContext('webgl2');
+    // Release the probe context right away; browsers limit how many can be alive.
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
+    return !!gl;
   } catch {
     return false;
   }
+}
+
+/** Yields to the event loop. Unlike setTimeout, MessageChannel isn't throttled to ~1/s in hidden tabs. */
+function yieldToBrowser(): Promise<void> {
+  return new Promise((resolve) => {
+    const channel = new MessageChannel();
+    channel.port1.onmessage = () => {
+      channel.port1.close();
+      resolve();
+    };
+    channel.port2.postMessage(null);
+  });
 }
 
 export function abortError(): DOMException {
@@ -47,7 +62,7 @@ let queue: Promise<unknown> = Promise.resolve();
 export function enqueueRender<T>(job: () => Promise<T> | T, signal?: AbortSignal): Promise<T> {
   const result = queue.then(async () => {
     if (signal?.aborted) throw abortError();
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await yieldToBrowser();
     if (signal?.aborted) throw abortError();
     return job();
   });

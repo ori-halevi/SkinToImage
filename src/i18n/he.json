@@ -2,7 +2,10 @@
   "app": {
     "privacy": "הסקין שלך לא עוזב את המכשיר",
     "disclaimer": "זה לא מוצר רשמי של Minecraft. לא מאושר על ידי Mojang או Microsoft ולא קשור אליהן.",
-    "language": "שפה"
+    "language": "שפה",
+    "updateReady": "יש גרסה חדשה של האתר.",
+    "updateNow": "עדכון",
+    "updateLater": "אחר כך"
   },
   "upload": {
     "title": "הופכים את הסקין שלך לתמונות מוכנות ל-Thumbnail",
@@ -44,10 +47,10 @@
     "shaded": "מוצללת",
     "flat": "שטוחה",
     "headSize": "גודל ראש: {{value}}×",
-    "outline": "מסגרת",
-    "outlineEnable": "הפעלת מסגרת",
-    "outlineWidth": "עובי המסגרת",
-    "outlineColor": "צבע המסגרת",
+    "outline": "קו מתאר",
+    "outlineEnable": "הפעלת קו מתאר",
+    "outlineWidth": "עובי קו המתאר",
+    "outlineColor": "צבע קו המתאר",
     "exportSize": "גודל להורדה",
     "settings": "הגדרות",
     "preview": "תצוגה תלת-ממדית. גררו כדי לסובב.",
@@ -91,7 +94,7 @@
     "select": "בחירת {{name}}",
     "selected_one": "נבחרה תמונה אחת",
     "selected_other": "נבחרו {{count}} תמונות",
-    "selectAll": "לבחור הכול",
+    "selectAll": "בחירת הכול",
     "clear": "ניקוי",
     "downloadZip": "הורדת ZIP",
     "zipProgress": "יוצר {{done}}/{{total}}…",
@@ -99,8 +102,9 @@
     "open": "פתיחת {{name}}",
     "posesTab": "פוזות",
     "scenesTab": "סצנות",
-    "downloadAll": "להוריד הכול",
-    "scenesHint": "הסצנות משתמשות בכל הסקינים שלך. אפשר להוסיף סקינים כדי למלא את כל הדמויות."
+    "downloadAll": "הורדת הכול",
+    "scenesHint": "הסצנות משתמשות בכל הסקינים שלך. אפשר להוסיף סקינים כדי למלא את כל הדמויות.",
+    "selected_two": "נבחרו 2 תמונות"
   },
   "categories": {
     "emotion": "רגשות",
@@ -114,14 +118,15 @@
     "share": "שיתוף",
     "close": "סגירה",
     "rendering": "יוצר תמונה…",
-    "downloaded": "הורד!",
-    "copied": "הועתק!",
+    "downloaded": "ההורדה הושלמה!",
+    "copied": "הועתק ללוח!",
     "shared": "שותף!",
     "select": "להוסיף ל-ZIP",
     "previous": "הפוזה הקודמת",
     "next": "הפוזה הבאה",
     "cast": "דמויות",
-    "slot": "דמות {{n}}"
+    "slot": "דמות {{n}}",
+    "shareReady": "התמונה מוכנה. לחצו שוב על שיתוף."
   },
   "poses": {
     "wave": "נפנוף",
