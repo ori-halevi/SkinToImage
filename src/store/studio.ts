@@ -4,7 +4,8 @@ import type { CameraId } from '../data/cameras';
 import type { PoseCategory } from '../data/poses/types';
 import { saveRecentSkin } from '../features/skins/recentSkins';
 import type { Skin } from '../features/skins/types';
-import { shotKey, type ShotKind, type ShotRef } from '../features/studio/shots';
+import { castForScene, shotKey, swapCast, type ShotKind, type ShotRef } from '../features/studio/shots';
+import { getScene, SCENES } from '../data/scenes';
 import { releaseBackgroundImages } from '../render/postprocess/frame';
 import { forgetSkin, type RenderSettings } from '../render/renderShot';
 import { DEFAULT_SETTINGS, sanitizeCameraId, sanitizeOneOf, sanitizeSettings } from './sanitize';
@@ -17,7 +18,7 @@ export const MAX_ACTIVE_SKINS = 6;
 export const DEFAULT_CAMERA_ID: CameraId = 'left';
 export const DEFAULT_EXPORT_SIZE: ExportSize = 2048;
 
-type SkinPatch = Partial<Pick<Skin, 'name' | 'model' | 'overlay'>>;
+type SkinPatch = Partial<Pick<Skin, 'name' | 'model' | 'overlay' | 'silhouette'>>;
 
 interface StudioState {
   /** Skins in this session, up to MAX_ACTIVE_SKINS. */
@@ -43,6 +44,8 @@ interface StudioState {
   updateSkin: (id: string, patch: SkinPatch) => void;
   /** Stores the full cast (skin id per slot) for a scene. */
   setSceneCast: (sceneId: string, skinIds: string[]) => void;
+  /** Swaps who plays which character in one scene, or in every scene when no id is given. */
+  swapCast: (sceneId?: string) => void;
   updateSettings: (patch: Partial<RenderSettings>) => void;
   resetSettings: () => void;
   setCamera: (cameraId: CameraId) => void;
@@ -103,6 +106,18 @@ export const useStudio = create<StudioState>()(
         set((s) => ({ skins: s.skins.map((k) => (k.id === id ? next : k)) }));
       },
       setSceneCast: (sceneId, skinIds) => set((s) => ({ sceneCast: { ...s.sceneCast, [sceneId]: skinIds } })),
+      swapCast: (sceneId) =>
+        set((s) => {
+          const activeSkin = s.skins.find((k) => k.id === s.activeSkinId) ?? s.skins[0];
+          if (!activeSkin) return {};
+          const ctx = { skins: s.skins, activeSkin, sceneCast: s.sceneCast };
+          const scenes = sceneId ? [getScene(sceneId)].filter((x) => !!x) : SCENES;
+          const sceneCast = { ...s.sceneCast };
+          for (const scene of scenes) {
+            sceneCast[scene.id] = swapCast(castForScene(scene, ctx), (k) => k.id).map((k) => k.id);
+          }
+          return { sceneCast };
+        }),
       updateSettings: (patch) => {
         // Leaving the image background frees the decoded photo.
         if (patch.background && patch.background.type !== 'image') releaseBackgroundImages();

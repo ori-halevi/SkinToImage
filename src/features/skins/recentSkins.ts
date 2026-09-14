@@ -1,4 +1,4 @@
-import { createStore, del, entries, set } from 'idb-keyval';
+import { createStore, del, entries, get, set } from 'idb-keyval';
 import { loadSkinFromBlob, SkinLoadError } from './loadSkin';
 import type { OverlayParts, Skin, SkinModel } from './types';
 
@@ -12,6 +12,7 @@ interface StoredSkin {
   model: SkinModel;
   defaultModel?: SkinModel;
   overlay?: OverlayParts;
+  silhouette?: boolean;
   /** Saved by older versions, before per-part layers. */
   showOverlay?: boolean;
   blob: Blob;
@@ -32,6 +33,7 @@ export async function listRecentSkins(): Promise<Skin[]> {
             id: s.id,
             model: s.model,
             defaultModel: s.defaultModel,
+            silhouette: s.silhouette,
             overlay: s.overlay ?? (s.showOverlay === false ? NO_OVERLAY : undefined),
           });
           return { ...skin, lastUsedAt: s.lastUsedAt };
@@ -48,6 +50,17 @@ export async function listRecentSkins(): Promise<Skin[]> {
   }
 }
 
+/** Loads one saved skin by id (e.g. to re-render an editor image after a reload). */
+export async function getRecentSkin(id: string): Promise<Skin | null> {
+  try {
+    const s = await get<StoredSkin>(id, store);
+    if (!s) return null;
+    return await loadSkinFromBlob(s.blob, s.name, { id: s.id, model: s.model, defaultModel: s.defaultModel, silhouette: s.silhouette, overlay: s.overlay });
+  } catch {
+    return null;
+  }
+}
+
 export async function saveRecentSkin(skin: Skin): Promise<void> {
   try {
     const stored: StoredSkin = {
@@ -56,6 +69,7 @@ export async function saveRecentSkin(skin: Skin): Promise<void> {
       model: skin.model,
       defaultModel: skin.defaultModel,
       overlay: skin.overlay,
+      silhouette: skin.silhouette,
       blob: skin.blob,
       lastUsedAt: skin.lastUsedAt,
     };

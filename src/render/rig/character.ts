@@ -25,6 +25,8 @@ export interface CharacterOptions {
   lighting: Lighting;
   /** Second layer (hat/jacket/sleeves/pants) per body part. Parts not listed are shown. */
   overlay?: Partial<Record<PartId, boolean>>;
+  /** Render the whole character flat black (a "mystery" silhouette), keeping the skin's cut-outs. */
+  silhouette?: boolean;
 }
 
 export interface HeldItems {
@@ -52,10 +54,13 @@ export class Character {
     this.texture.colorSpace = SRGBColorSpace;
     this.texture.needsUpdate = true;
 
-    const Mat = options.lighting === 'shaded' ? MeshLambertMaterial : MeshBasicMaterial;
+    // A silhouette ignores lighting: black times any texel is black, while the texture's alpha still
+    // cuts out transparent overlay pixels.
+    const Mat = options.lighting === 'shaded' && !options.silhouette ? MeshLambertMaterial : MeshBasicMaterial;
+    const tint = options.silhouette ? { color: 0x000000 } : {};
     // The base layer is always opaque, like in-game; the overlay layer supports (semi-)transparency.
-    const baseMaterial = new Mat({ map: this.texture, side: FrontSide });
-    const overlayMaterial = new Mat({ map: this.texture, side: DoubleSide, transparent: true, alphaTest: 0.01 });
+    const baseMaterial = new Mat({ map: this.texture, side: FrontSide, ...tint });
+    const overlayMaterial = new Mat({ map: this.texture, side: DoubleSide, transparent: true, alphaTest: 0.01, ...tint });
     this.materials = [baseMaterial, overlayMaterial];
 
     for (const part of getPartLayouts(options.model)) {

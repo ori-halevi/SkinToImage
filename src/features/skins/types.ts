@@ -25,6 +25,8 @@ export interface Skin {
   bitmap: ImageBitmap;
   /** Second-layer visibility per body part. */
   overlay: OverlayParts;
+  /** Render this skin as an all-black "mystery" silhouette. */
+  silhouette: boolean;
   lastUsedAt: number;
 }
 

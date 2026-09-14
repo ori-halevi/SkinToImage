@@ -177,6 +177,41 @@ test('editor: add characters from the gallery, add text, undo, export', async ({
   await expect(page.getByRole('dialog', { name: 'Projects' }).getByRole('button', { name: /^Open My thumbnail/ })).toBeVisible();
 });
 
+test('swap characters and black silhouettes', async ({ page }) => {
+  await loadSample(page);
+  await page.getByRole('button', { name: 'Add skin' }).click();
+  await page.getByRole('dialog', { name: 'Add a skin' }).getByRole('button', { name: 'Try a sample skin' }).click();
+  await page.getByRole('textbox', { name: 'Skin name' }).first().fill('second');
+  await page.getByRole('textbox', { name: 'Skin name' }).first().press('Enter');
+
+  await page.getByRole('tab', { name: 'Scenes' }).click();
+  await page.getByRole('button', { name: 'Open Face-off' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Face-off' });
+  const slots = dialog.getByRole('combobox');
+  const before = [await slots.nth(0).inputValue(), await slots.nth(1).inputValue()];
+  expect(before[0]).not.toBe(before[1]);
+  await dialog.getByRole('button', { name: 'Swap', exact: true }).click();
+  await expect(slots.nth(0)).toHaveValue(before[1]);
+  await expect(slots.nth(1)).toHaveValue(before[0]);
+
+  const silhouette = dialog.getByRole('button', { name: /^Black silhouette for / }).first();
+  await silhouette.click();
+  await expect(silhouette).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('editor: paste an image from the clipboard as the background', async ({ page }) => {
+  await page.goto('/#editor');
+  await expect(page.getByRole('button', { name: 'Add character' })).toBeVisible();
+  const png = (await readFile('public/icon-512.png')).toString('base64');
+  await page.evaluate(async (b64) => {
+    const blob = await (await fetch(`data:image/png;base64,${b64}`)).blob();
+    const data = new DataTransfer();
+    data.items.add(new File([blob], 'bg.png', { type: 'image/png' }));
+    window.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data }));
+  }, png);
+  await expect(page.getByRole('button', { name: 'Image', exact: true })).toHaveAttribute('aria-pressed', 'true');
+});
+
 test('rejects invalid files with a clear error', async ({ page }) => {
   await page.getByTestId('skin-input').setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: Buffer.from([1, 2, 3]) });
   await expect(page.getByRole('alert')).toHaveText('Only PNG skin files are supported.');

@@ -1,9 +1,13 @@
-import { useId } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { buttonSecondary, ColorInput, Field, Segmented, Slider, Toggle } from '../../../ui/controls';
 import { FONT_IDS, FONTS } from '../fonts';
 import { useComposer } from '../store';
-import type { Layer, TextLayer } from '../types';
+import type { ImageLayer, Layer, TextLayer } from '../types';
+import { MissingSkinsError, rerenderLayer } from '../rerender';
+import { swapCast } from '../../studio/shots';
+import { useStudio } from '../../../store/studio';
+import { getRecentSkin } from '../../skins/recentSkins';
 
 export function PropertiesPanel() {
   const { t } = useTranslation();
@@ -24,6 +28,7 @@ function LayerProperties({ layer }: { layer: Layer }) {
   return (
     <>
       {layer.type === 'text' && <TextProperties layer={layer} />}
+      {layer.type === 'image' && layer.source && <CharacterProperties key={layer.id} layer={layer} />}
 
       <Slider
         label={t('composer.opacity')}
@@ -119,4 +124,90 @@ function TextProperties({ layer }: { layer: TextLayer }) {
       </Field>
     </>
   );
+}
+
+/** Swap characters / black out individual characters of an image added from the gallery. */
+function CharacterProperties({ layer }: { layer: ImageLayer }) {
+  const { t } = useTranslation();
+  const cast = layer.source!.cast;
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const names = useSkinNames(cast.map((c) => c.skinId));
+  const distinct = new Set(cast.map((c) => c.skinId)).size;
+
+  const apply = async (next: typeof cast) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await rerenderLayer(layer, next);
+    } catch (e) {
+      setError(e instanceof MissingSkinsError ? t('composer.skinsMissing') : t('errors.render'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2 border-b border-edge pb-4">
+      <div className="flex items-center gap-2 text-sm">
+        <span className="font-medium">{t('dialog.cast')}</span>
+        <span className="ms-auto" />
+        {distinct > 1 && (
+          <button
+            disabled={busy}
+            onClick={() => void apply(swapCast(cast, (c) => c.skinId, (_, next) => ({ skinId: next.skinId, silhouette: next.silhouette })))}
+            className={`${buttonSecondary} px-2 py-0.5 text-xs`}
+          >
+            <span aria-hidden>⇄</span> {t('dialog.swap')}
+          </button>
+        )}
+      </div>
+      <ul className="flex flex-col gap-1">
+        {cast.map((member, i) => (
+          <li key={i} className="flex items-center gap-2 text-sm">
+            <span className="text-slate-400">{cast.length > 1 ? t('dialog.slot', { n: i + 1 }) : t('studio.character')}</span>
+            <span className="min-w-0 flex-1 truncate">{names[member.skinId] ?? '…'}</span>
+            <button
+              type="button"
+              disabled={busy}
+              aria-pressed={member.silhouette}
+              aria-label={t('dialog.silhouetteFor', { name: names[member.skinId] ?? '' })}
+              title={t('studio.silhouette')}
+              onClick={() => void apply(cast.map((c, j) => (j === i ? { ...c, silhouette: !c.silhouette } : c)))}
+              className={`inline-flex size-7 items-center justify-center rounded-md border transition-colors ${
+                member.silhouette ? 'border-slate-300 bg-black text-white' : 'border-edge text-slate-500 hover:text-white'
+              }`}
+            >
+              <span aria-hidden className="text-xs">👤</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {busy && <p className="text-xs text-slate-400">{t('dialog.rendering')}</p>}
+      {error && <p role="alert" className="text-xs text-red-300">{error}</p>}
+    </div>
+  );
+}
+
+/** Skin names by id, from loaded skins or recent skins. */
+function useSkinNames(ids: string[]): Record<string, string> {
+  const loaded = useStudio((s) => s.skins);
+  const [names, setNames] = useState<Record<string, string>>({});
+  const key = ids.join(',');
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const result: Record<string, string> = {};
+      for (const id of new Set(key.split(','))) {
+        const skin = loaded.find((s) => s.id === id) ?? (await getRecentSkin(id));
+        if (skin) result[id] = skin.name;
+        if (skin && !loaded.includes(skin)) skin.bitmap.close();
+      }
+      if (!cancelled) setNames(result);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [key, loaded]);
+  return names;
 }

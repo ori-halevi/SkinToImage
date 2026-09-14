@@ -38,6 +38,8 @@ export interface ActorSpec {
   /** Degrees. */
   rotationY?: number;
   items?: HeldItems;
+  /** Render this character as a flat black silhouette. */
+  silhouette?: boolean;
 }
 
 export interface ShotSpec {
@@ -72,13 +74,13 @@ const CHARACTER_CACHE_LIMIT = 12;
 const characters = new Map<string, Character>();
 
 /** `occurrence` distinguishes the same skin appearing more than once in a shot. */
-function getCharacter(skin: Skin, lighting: Lighting, occurrence: number): Character {
-  const key = `${skin.id}|${skin.model}|${JSON.stringify(skin.overlay)}|${lighting}#${occurrence}`;
+function getCharacter(skin: Skin, lighting: Lighting, silhouette: boolean, occurrence: number): Character {
+  const key = `${skin.id}|${skin.model}|${JSON.stringify(skin.overlay)}|${lighting}|${silhouette}#${occurrence}`;
   let character = characters.get(key);
   if (character) {
     characters.delete(key);
   } else {
-    character = new Character(skin.bitmap, { model: skin.model, lighting, overlay: skin.overlay });
+    character = new Character(skin.bitmap, { model: skin.model, lighting, overlay: skin.overlay, silhouette });
   }
   characters.set(key, character);
   if (characters.size > CHARACTER_CACHE_LIMIT) {
@@ -104,7 +106,7 @@ export function forgetSkin(skinId: string): void {
 /** Stable identity of everything that affects a render's pixels. */
 export function renderKey({ actors, props, camera, settings, size }: ShotSpec): string {
   return JSON.stringify([
-    actors.map((a) => [a.skin.id, a.skin.model, a.skin.overlay, a.pose.id, a.position, a.rotationY, a.items]),
+    actors.map((a) => [a.skin.id, a.skin.model, a.skin.overlay, a.silhouette ?? false, a.pose.id, a.position, a.rotationY, a.items]),
     props,
     camera.id,
     settings,
@@ -193,7 +195,7 @@ async function renderShotNow({ actors, props = [], camera: preset, settings, siz
   for (const actor of actors) {
     const occurrence = occurrences.get(actor.skin.id) ?? 0;
     occurrences.set(actor.skin.id, occurrence + 1);
-    const character = getCharacter(actor.skin, settings.lighting, occurrence);
+    const character = getCharacter(actor.skin, settings.lighting, actor.silhouette ?? false, occurrence);
     character.applyPose(actor.pose, settings.bigHead);
     character.setHeldItems(actor.items);
 

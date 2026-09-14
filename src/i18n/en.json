@@ -87,7 +87,10 @@
     "overlayNone": "None",
     "resetField": "Reset {{name}} to default",
     "resetSection": "Reset {{name}}",
-    "modified": "Changed from default"
+    "modified": "Changed from default",
+    "silhouette": "Black silhouette (hide who it is)",
+    "pasteImage": "Paste image",
+    "pasteHint": "Or press Ctrl+V anywhere with an image copied"
   },
   "gallery": {
     "all": "All",
@@ -105,7 +108,9 @@
     "downloadAll": "Download all",
     "scenesHint": "Scenes use all your skins. Add up to 6 skins to fill every character.",
     "castCount_one": "{{count}} character",
-    "castCount_other": "{{count}} characters"
+    "castCount_other": "{{count}} characters",
+    "swapAll": "Swap characters",
+    "swapHint": "Changes who plays which character in every scene"
   },
   "categories": {
     "emotion": "Emotions",
@@ -127,7 +132,9 @@
     "next": "Next pose",
     "cast": "Characters",
     "slot": "Character {{n}}",
-    "shareReady": "Image ready. Tap Share again."
+    "shareReady": "Image ready. Tap Share again.",
+    "swap": "Swap",
+    "silhouetteFor": "Black silhouette for {{name}}"
   },
   "poses": {
     "wave": "Wave",
@@ -314,6 +321,8 @@
       "youtubeHd": "YouTube HD",
       "square": "Square",
       "shorts": "Shorts / TikTok"
-    }
+    },
+    "pasteHint": "Tip: copy an image anywhere and press Ctrl+V here to use it as the background.",
+    "skinsMissing": "The skins for this image aren't available anymore. Load them again in the generator."
   }
 }

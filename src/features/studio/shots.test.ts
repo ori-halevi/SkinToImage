@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getScene } from '../../data/scenes';
 import { DEFAULT_SETTINGS } from '../../store/studio';
 import type { Skin } from '../skins/types';
-import { buildShot, castForScene, parseShotKey, shotFilename, shotKey } from './shots';
+import { buildShot, castForScene, parseShotKey, resolveCast, shotFilename, shotKey, swapCast } from './shots';
 
 const skin = (id: string): Skin => ({
   id,
@@ -14,6 +14,7 @@ const skin = (id: string): Skin => ({
   blob: new Blob(),
   bitmap: {} as ImageBitmap,
   overlay: { head: true, body: true, rightArm: true, leftArm: true, rightLeg: true, leftLeg: true },
+  silhouette: false,
   lastUsedAt: 0,
 });
 
@@ -62,5 +63,29 @@ describe('buildShot', () => {
   it('names files after the cast', () => {
     expect(shotFilename({ kind: 'pose', id: 'wave', cameraId: 'left' }, ctx)).toBe('alex_wave_left.png');
     expect(shotFilename({ kind: 'scene', id: 'faceOff', cameraId: 'hero' }, ctx)).toBe('alex+bo_faceOff_hero.png');
+  });
+});
+
+describe('swapCast', () => {
+  const id = (x: string) => x;
+  it('rotates distinct skins through the slots', () => {
+    expect(swapCast(['a', 'b'], id)).toEqual(['b', 'a']);
+    expect(swapCast(['a', 'b', 'c'], id)).toEqual(['b', 'c', 'a']);
+    expect(swapCast(['a', 'b', 'a'], id)).toEqual(['b', 'a', 'b']);
+  });
+  it('leaves single-skin casts alone', () => expect(swapCast(['a', 'a'], id)).toEqual(['a', 'a']));
+  it('keeps extra data with the identity when asked', () => {
+    const cast = [{ skinId: 'a', silhouette: true }, { skinId: 'b', silhouette: false }];
+    expect(swapCast(cast, (c) => c.skinId, (_, next) => next)).toEqual([cast[1], cast[0]]);
+  });
+});
+
+describe('silhouettes', () => {
+  it('follow the skin into the render request', () => {
+    const hidden = { ...b, silhouette: true };
+    const ctx = { skins: [a, hidden], activeSkin: a, sceneCast: {}, settings: DEFAULT_SETTINGS };
+    expect(resolveCast({ kind: 'scene', id: 'faceOff', cameraId: 'left' }, ctx).map((c) => c.silhouette)).toEqual([false, true]);
+    const spec = buildShot({ kind: 'scene', id: 'faceOff', cameraId: 'left' }, ctx, 256)!;
+    expect(spec.actors.map((x) => x.silhouette)).toEqual([false, true]);
   });
 });

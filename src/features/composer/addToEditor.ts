@@ -2,6 +2,7 @@ import { navigate } from '../../app/route';
 import { createImageLayer } from './docOps';
 import { assetSize, listProjects, saveAsset } from './storage';
 import { useComposer } from './store';
+import type { ShotSource } from './types';
 
 /** Makes sure a project is open: the one already in memory, the most recent saved one, or a new one. */
 export async function ensureProject(defaultName: string) {
@@ -16,13 +17,13 @@ export async function ensureProject(defaultName: string) {
 }
 
 /** Stores rendered images as assets, adds them to the open project and switches to the editor. */
-export async function addImagesToEditor(images: { blob: Blob; label: string }[], defaultProjectName: string): Promise<void> {
+export async function addImagesToEditor(images: { blob: Blob; label: string; source?: ShotSource }[], defaultProjectName: string): Promise<void> {
   await ensureProject(defaultProjectName);
-  for (const { blob, label } of images) {
+  for (const { blob, label, source } of images) {
     const [assetId, size] = await Promise.all([saveAsset(blob), assetSize(blob)]);
     const { project, addLayer } = useComposer.getState();
     if (!project) return;
-    addLayer(createImageLayer(project, { assetId, label, ...size }));
+    addLayer({ ...createImageLayer(project, { assetId, label, ...size }), source });
   }
   navigate('editor');
 }

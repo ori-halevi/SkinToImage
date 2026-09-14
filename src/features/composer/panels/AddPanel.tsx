@@ -6,6 +6,7 @@ import { createImageLayer, createTextLayer } from '../docOps';
 import { assetSize, saveAsset } from '../storage';
 import { useComposer } from '../store';
 import { CharacterPicker } from './CharacterPicker';
+import { canReadClipboard, readClipboardImage } from '../../export/clipboard';
 
 const BACKGROUNDS: Record<Exclude<Background['type'], 'image'>, Background> = {
   transparent: { type: 'transparent' },
@@ -90,11 +91,25 @@ export function AddPanel() {
               <ColorInput label={t('studio.bgRays')} value={background.rays} onChange={(rays) => setBackground({ ...background, rays })} />
             </>
           )}
-          {background.type === 'image' && (
-            <button onClick={() => backgroundInput.current?.click()} className={`${buttonSecondary} py-1 text-sm`}>
-              {t('studio.uploadImage')}
-            </button>
-          )}
+          <div className="flex flex-wrap gap-2">
+            {background.type === 'image' && (
+              <button onClick={() => backgroundInput.current?.click()} className={`${buttonSecondary} py-1 text-sm`}>
+                {t('studio.uploadImage')}
+              </button>
+            )}
+            {canReadClipboard() && (
+              <button
+                onClick={async () => {
+                  const image = await readClipboardImage();
+                  if (image) setBackground({ type: 'image', imageId: await saveAsset(image) });
+                }}
+                className={`${buttonSecondary} py-1 text-sm`}
+              >
+                {t('studio.pasteImage')}
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-slate-500">{t('composer.pasteHint')}</p>
         </div>
       </div>
 

@@ -35,7 +35,7 @@ interface Stage {
  */
 export function LivePreview({ skin, lighting, bigHead, heldItem }: Props) {
   const { t } = useTranslation();
-  const { bitmap, model, overlay } = skin; // renaming the skin shouldn't rebuild the scene
+  const { bitmap, model, overlay, silhouette } = skin; // renaming the skin shouldn't rebuild the scene
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Stage | null>(null);
 
@@ -137,13 +137,13 @@ export function LivePreview({ skin, lighting, bigHead, heldItem }: Props) {
     if (!stage) return;
     stage.character?.root.removeFromParent();
     stage.character?.dispose();
-    const character = new Character(bitmap, { model, lighting, overlay });
+    const character = new Character(bitmap, { model, lighting, overlay, silhouette });
     stage.scene.add(character.root);
     stage.character = character;
 
     stage.lights.clear();
     if (lighting === 'shaded') addLights(stage.lights, new Vector3(0, 0.1, 1));
-  }, [bitmap, model, overlay, lighting]);
+  }, [bitmap, model, overlay, silhouette, lighting]);
 
   // Cheap changes (and after a rebuild): pose, head size and item update the existing model in place.
   useEffect(() => {
@@ -155,7 +155,7 @@ export function LivePreview({ skin, lighting, bigHead, heldItem }: Props) {
     // Frame a front view with extra margin so the character stays in frame while spinning.
     fitCamera(stage.camera, { id: 'front', yaw: 0, pitch: 8, fov: 30 }, character.meshes, 0.7);
     stage.draw();
-  }, [bitmap, model, overlay, lighting, bigHead, heldItem]);
+  }, [bitmap, model, overlay, silhouette, lighting, bigHead, heldItem]);
 
   return (
     <div

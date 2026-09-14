@@ -1,4 +1,6 @@
 import type { Background } from '../../render/postprocess/frame';
+import type { RenderSettings } from '../../render/renderShot';
+import type { ShotRef } from '../studio/shots';
 
 export type CanvasPresetId = 'youtube' | 'youtubeHd' | 'square' | 'shorts';
 
@@ -36,6 +38,15 @@ export interface ImageLayer extends BaseLayer {
   height: number;
   /** What the image is, for the layers list (e.g. a pose name or file name). */
   label: string;
+  /** How a character image was rendered, so the editor can re-render it (swap characters, silhouettes). */
+  source?: ShotSource;
+}
+
+export interface ShotSource {
+  shot: ShotRef;
+  /** Per character slot: which skin (by id) and whether it's blacked out. */
+  cast: { skinId: string; silhouette: boolean }[];
+  settings: RenderSettings;
 }
 
 export type FontId = 'impact' | 'pixel' | 'bold';

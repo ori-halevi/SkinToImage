@@ -11,6 +11,8 @@ import { LayersPanel } from './panels/LayersPanel';
 import { PropertiesPanel } from './panels/PropertiesPanel';
 import { ProjectsDialog } from './panels/ProjectsDialog';
 import { useComposer } from './store';
+import { saveAsset } from './storage';
+import { imageFromPaste, isEditingText } from '../export/clipboard';
 import { CANVAS_PRESET_IDS, CANVAS_PRESETS, presetFor, type CanvasPresetId } from './types';
 
 const THUMBNAIL_WIDTH = 320;
@@ -40,6 +42,7 @@ function Editor() {
 
   useEffect(() => setNameDraft(project.name), [project.id, project.name]);
   useKeyboardShortcuts();
+  usePasteBackground();
   useThumbnail(project.updatedAt);
 
   const preset = presetFor(project.width, project.height);
@@ -117,6 +120,21 @@ function Editor() {
       {projectsOpen && <ProjectsDialog onClose={() => setProjectsOpen(false)} />}
     </div>
   );
+}
+
+/** Ctrl+V with an image in the clipboard sets it as the background: no need to save it to disk first. */
+function usePasteBackground() {
+  useEffect(() => {
+    const onPaste = async (e: ClipboardEvent) => {
+      if (isEditingText(e) || document.querySelector('dialog[open]')) return;
+      const image = imageFromPaste(e);
+      if (!image) return;
+      e.preventDefault();
+      useComposer.getState().setBackground({ type: 'image', imageId: await saveAsset(image) });
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, []);
 }
 
 function useKeyboardShortcuts() {

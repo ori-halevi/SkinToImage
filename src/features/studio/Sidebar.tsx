@@ -19,6 +19,7 @@ import { sanitizeName } from '../skins/loadSkin';
 import { ALL_OVERLAY_PARTS, type Skin } from '../skins/types';
 import { LivePreview } from './LivePreview';
 import { OverlayPicker } from './OverlayPicker';
+import { canReadClipboard, readClipboardImage } from '../export/clipboard';
 
 const BACKGROUND_DEFAULTS: Record<Exclude<Background['type'], 'image'>, Background> = {
   transparent: { type: 'transparent' },
@@ -57,7 +58,7 @@ export function Sidebar({ skin }: { skin: Skin }) {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const skinChanged = skin.model !== skin.defaultModel || !same(skin.overlay, ALL_OVERLAY_PARTS);
+  const skinChanged = skin.model !== skin.defaultModel || !same(skin.overlay, ALL_OVERLAY_PARTS) || skin.silhouette;
   const characterReset = resetKeys('heldItem', 'bigHead');
   const cameraChanged = cameraId !== DEFAULT_CAMERA_ID || settings.mirror !== DEFAULT_SETTINGS.mirror;
   const anythingChanged = !same(settings, DEFAULT_SETTINGS) || cameraId !== DEFAULT_CAMERA_ID || exportSize !== DEFAULT_EXPORT_SIZE;
@@ -91,7 +92,7 @@ export function Sidebar({ skin }: { skin: Skin }) {
             onReset={
               skinChanged || characterReset
                 ? () => {
-                    updateSkin(skin.id, { model: skin.defaultModel, overlay: ALL_OVERLAY_PARTS });
+                    updateSkin(skin.id, { model: skin.defaultModel, overlay: ALL_OVERLAY_PARTS, silhouette: false });
                     characterReset?.();
                   }
                 : undefined
@@ -116,6 +117,12 @@ export function Sidebar({ skin }: { skin: Skin }) {
               />
             </Field>
             <OverlayPicker skin={skin} onChange={(overlay) => updateSkin(skin.id, { overlay })} />
+            <Toggle
+              label={t('studio.silhouette')}
+              checked={skin.silhouette}
+              onChange={(silhouette) => updateSkin(skin.id, { silhouette })}
+              onReset={skin.silhouette ? () => updateSkin(skin.id, { silhouette: false }) : undefined}
+            />
             <Select
               label={t('studio.heldItem')}
               value={settings.heldItem}
@@ -431,11 +438,26 @@ function BackgroundFields() {
           <ColorInput label={t('studio.bgRays')} value={background.rays} onChange={(rays) => setBackground({ ...background, rays })} onReset={resetColor('rays')} />
         </>
       )}
-      {background.type === 'image' && (
-        <button onClick={() => fileRef.current?.click()} className={`${buttonSecondary} py-1 text-sm`}>
-          {t('studio.uploadImage')}
-        </button>
-      )}
+      <div className="flex flex-wrap gap-2">
+        {background.type === 'image' && (
+          <button onClick={() => fileRef.current?.click()} className={`${buttonSecondary} py-1 text-sm`}>
+            {t('studio.uploadImage')}
+          </button>
+        )}
+        {canReadClipboard() && (
+          <button
+            onClick={async () => {
+              const image = await readClipboardImage();
+              if (image) setBackground({ type: 'image', imageId: await registerBackgroundImage(image) });
+              if (image && settings.frame === 'fit') updateSettings({ frame: '16:9' });
+            }}
+            className={`${buttonSecondary} py-1 text-sm`}
+            title={t('studio.pasteHint')}
+          >
+            {t('studio.pasteImage')}
+          </button>
+        )}
+      </div>
     </>
   );
 }

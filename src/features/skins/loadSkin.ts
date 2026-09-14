@@ -16,6 +16,7 @@ export interface SkinOverrides {
   /** Authoritative default model (e.g. from the player's profile); falls back to pixel detection. */
   defaultModel?: SkinModel;
   overlay?: Partial<OverlayParts>;
+  silhouette?: boolean;
   /** Convert legacy 64×32 skins instead of rejecting them (used for skins fetched by username). */
   upgradeLegacy?: boolean;
 }
@@ -57,6 +58,7 @@ export async function loadSkinFromBlob(blob: Blob, name: string, overrides: Skin
     blob,
     bitmap,
     overlay: { ...ALL_OVERLAY_PARTS, ...overrides.overlay },
+    silhouette: overrides.silhouette ?? false,
     lastUsedAt: Date.now(),
   };
 }

@@ -87,7 +87,10 @@
     "overlayNone": "כלום",
     "resetField": "החזרת {{name}} לברירת המחדל",
     "resetSection": "איפוס {{name}}",
-    "modified": "שונה מברירת המחדל"
+    "modified": "שונה מברירת המחדל",
+    "silhouette": "צללית שחורה (להסתיר מי זה)",
+    "pasteImage": "הדבקת תמונה",
+    "pasteHint": "אפשר גם ללחוץ Ctrl+V בכל מקום אחרי שמעתיקים תמונה"
   },
   "gallery": {
     "all": "הכול",
@@ -107,7 +110,9 @@
     "selected_two": "נבחרו 2 תמונות",
     "castCount_one": "דמות אחת",
     "castCount_two": "2 דמויות",
-    "castCount_other": "{{count}} דמויות"
+    "castCount_other": "{{count}} דמויות",
+    "swapAll": "החלפת דמויות",
+    "swapHint": "משנה מי משחק איזו דמות בכל הסצנות"
   },
   "categories": {
     "emotion": "רגשות",
@@ -129,7 +134,9 @@
     "next": "הפוזה הבאה",
     "cast": "דמויות",
     "slot": "דמות {{n}}",
-    "shareReady": "התמונה מוכנה. לחצו שוב על שיתוף."
+    "shareReady": "התמונה מוכנה. לחצו שוב על שיתוף.",
+    "swap": "החלפה",
+    "silhouetteFor": "צללית שחורה ל-{{name}}"
   },
   "poses": {
     "wave": "נפנוף",
@@ -316,6 +323,8 @@
       "youtubeHd": "יוטיוב HD",
       "square": "ריבוע",
       "shorts": "שורטס / טיקטוק"
-    }
+    },
+    "pasteHint": "טיפ: מעתיקים תמונה מכל מקום ולוחצים כאן Ctrl+V כדי שתהיה הרקע.",
+    "skinsMissing": "הסקינים של התמונה הזו כבר לא זמינים. צריך לטעון אותם שוב במחולל."
   }
 }

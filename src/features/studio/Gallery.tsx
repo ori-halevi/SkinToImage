@@ -91,6 +91,14 @@ export function Gallery({ skin, cameraId }: { skin: Skin; cameraId: CameraId }) 
       </div>
 
       {mode === 'scene' && skinCount < 2 && <p className="text-sm text-slate-400">{t('gallery.scenesHint')}</p>}
+      {mode === 'scene' && skinCount >= 2 && (
+        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
+          <button onClick={() => useStudio.getState().swapCast()} className={`${buttonSecondary} py-1 text-sm text-slate-200`}>
+            <span aria-hidden>⇄</span> {t('gallery.swapAll')}
+          </button>
+          <span>{t('gallery.swapHint')}</span>
+        </div>
+      )}
 
       <SelectionBar skin={skin} visible={shots} />
 

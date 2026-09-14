@@ -121,8 +121,13 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
         />
 
         {scene && ctx.skins.length > 1 && (
-          <fieldset className="flex flex-wrap gap-3">
-            <legend className="mb-1 text-sm font-medium">{t('dialog.cast')}</legend>
+          <fieldset className="flex flex-wrap items-center gap-3">
+            <legend className="mb-1 flex w-full items-center gap-3 text-sm font-medium">
+              {t('dialog.cast')}
+              <button type="button" onClick={() => useStudio.getState().swapCast(scene.id)} className={`${buttonSecondary} px-2 py-0.5 text-xs font-normal`}>
+                <span aria-hidden>⇄</span> {t('dialog.swap')}
+              </button>
+            </legend>
             {castForScene(scene, ctx).map((castSkin, i) => (
               <label key={i} className="flex items-center gap-2 text-sm">
                 <span className="text-slate-400">{t('dialog.slot', { n: i + 1 })}</span>
@@ -142,6 +147,7 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
                     </option>
                   ))}
                 </select>
+                <SilhouetteButton skin={castSkin} />
               </label>
             ))}
           </fieldset>
@@ -183,5 +189,30 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
         </span>
       </div>
     </dialog>
+  );
+}
+
+/** Small, unobtrusive toggle that blacks out a skin everywhere it appears. */
+export function SilhouetteButton({ skin, on, onToggle }: { skin: Skin; on?: boolean; onToggle?: () => void }) {
+  const { t } = useTranslation();
+  const active = on ?? skin.silhouette;
+  const label = t('dialog.silhouetteFor', { name: skin.name });
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      aria-label={label}
+      title={label}
+      onClick={(e) => {
+        e.preventDefault();
+        if (onToggle) onToggle();
+        else useStudio.getState().updateSkin(skin.id, { silhouette: !skin.silhouette });
+      }}
+      className={`inline-flex size-7 items-center justify-center rounded-md border transition-colors ${
+        active ? 'border-slate-300 bg-black text-white' : 'border-edge text-slate-500 hover:text-white'
+      }`}
+    >
+      <span aria-hidden className="text-xs">👤</span>
+    </button>
   );
 }
