@@ -30,6 +30,11 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // A new deploy takes over immediately instead of waiting for every tab to close
+        // (installed PWAs almost never close, so they'd stay on old versions for days).
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,png,svg,webmanifest,woff2}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
