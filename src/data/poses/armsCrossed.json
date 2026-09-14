@@ -1,0 +1,21 @@
+{
+  "id": "armsCrossed",
+  "category": "casual",
+  "bones": {
+    "head": [
+      -4,
+      0,
+      0
+    ],
+    "rightArm": [
+      -60,
+      0,
+      55
+    ],
+    "leftArm": [
+      -55,
+      0,
+      -55
+    ]
+  }
+}

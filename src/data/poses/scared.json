@@ -1,0 +1,36 @@
+{
+  "id": "scared",
+  "category": "emotion",
+  "bones": {
+    "head": [
+      8,
+      0,
+      0
+    ],
+    "body": [
+      -12,
+      0,
+      0
+    ],
+    "rightArm": [
+      -120,
+      0,
+      15
+    ],
+    "leftArm": [
+      -120,
+      0,
+      -15
+    ],
+    "rightLeg": [
+      -10,
+      0,
+      -5
+    ],
+    "leftLeg": [
+      10,
+      0,
+      5
+    ]
+  }
+}

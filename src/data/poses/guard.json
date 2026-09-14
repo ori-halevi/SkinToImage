@@ -1,0 +1,36 @@
+{
+  "id": "guard",
+  "category": "action",
+  "bones": {
+    "head": [
+      5,
+      0,
+      0
+    ],
+    "body": [
+      5,
+      0,
+      0
+    ],
+    "rightArm": [
+      -110,
+      0,
+      40
+    ],
+    "leftArm": [
+      -100,
+      0,
+      -40
+    ],
+    "rightLeg": [
+      -8,
+      0,
+      -4
+    ],
+    "leftLeg": [
+      8,
+      0,
+      4
+    ]
+  }
+}

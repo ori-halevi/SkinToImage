@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
 import { POSES } from '../../data/poses';
 import { fitCamera } from '../../render/camera';
-import { addLights } from '../../render/renderPose';
+import type { ItemId } from '../../render/props/items';
+import { addLights } from '../../render/renderShot';
 import { Character, type Lighting } from '../../render/rig/character';
 import type { Skin } from '../skins/types';
 
@@ -11,15 +12,16 @@ interface Props {
   skin: Skin;
   lighting: Lighting;
   bigHead: number;
+  heldItem: ItemId | 'none';
 }
 
 const STAND = POSES.find((p) => p.id === 'stand')!;
 const AUTO_ROTATE_SPEED = 0.6; // radians per second
 
 /** Interactive 3D preview with drag-to-rotate. Owns its own (second) WebGL context. */
-export function LivePreview({ skin, lighting, bigHead }: Props) {
+export function LivePreview({ skin, lighting, bigHead, heldItem }: Props) {
   const { t } = useTranslation();
-  const { bitmap, model } = skin; // renaming the skin shouldn't rebuild the scene
+  const { bitmap, model, showOverlay } = skin; // renaming the skin shouldn't rebuild the scene
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,8 +35,9 @@ export function LivePreview({ skin, lighting, bigHead }: Props) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const scene = new Scene();
-    const character = new Character(bitmap, { model, lighting });
+    const character = new Character(bitmap, { model, lighting, overlay: showOverlay });
     character.applyPose(STAND, bigHead);
+    character.setHeldItems(heldItem === 'none' ? {} : { right: heldItem });
     scene.add(character.root);
     if (lighting === 'shaded') addLights(scene, new Vector3(0, 0.1, 1));
 
@@ -104,7 +107,7 @@ export function LivePreview({ skin, lighting, bigHead }: Props) {
       renderer.forceContextLoss();
       canvas.remove();
     };
-  }, [bitmap, model, lighting, bigHead]);
+  }, [bitmap, model, showOverlay, lighting, bigHead, heldItem]);
 
   return (
     <div

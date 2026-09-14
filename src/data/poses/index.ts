@@ -2,10 +2,14 @@ import type { Pose, PoseCategory } from './types';
 
 const modules = import.meta.glob<Pose>('./*.json', { eager: true, import: 'default' });
 
-/** Gallery order. Poses not listed here are appended at the end. */
+/** Gallery order: the most thumbnail-friendly poses first. Poses not listed are appended at the end. */
 const ORDER = [
-  'wave', 'point', 'shocked', 'facepalm', 'victory', 'thinking', 'pointSide', 'run',
-  'jump', 'dab', 'stand', 'salute', 'crouch', 'sit', 'fall', 'tpose',
+  'wave', 'point', 'shocked', 'facepalm', 'victory', 'thinking', 'pointSide', 'scared',
+  'angry', 'laugh', 'cry', 'confused', 'sad', 'thumbsUp', 'flex', 'run',
+  'jump', 'punch', 'kick', 'swordSwing', 'guard', 'throw', 'aim', 'fly',
+  'walk', 'dab', 'floss', 'zombie', 'ninjaRun', 'handstand', 'chicken', 'tpose',
+  'stand', 'armsCrossed', 'handsBehind', 'cheer', 'salute', 'selfie', 'bow', 'crouch',
+  'sit', 'sitGround', 'fall',
 ];
 
 export const POSES: Pose[] = Object.values(modules).sort((a, b) => {
@@ -15,3 +19,7 @@ export const POSES: Pose[] = Object.values(modules).sort((a, b) => {
 });
 
 export const POSE_CATEGORIES: PoseCategory[] = ['emotion', 'action', 'casual', 'funny'];
+
+export function getPose(id: string): Pose | undefined {
+  return POSES.find((p) => p.id === id);
+}

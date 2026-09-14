@@ -2,32 +2,35 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CAMERAS } from '../../data/cameras';
 import { POSES } from '../../data/poses';
-import { renderPose } from '../../render/renderPose';
-import { shotKey, useStudio, type ShotId } from '../../store/studio';
-import { buttonPrimary, buttonSecondary, Segmented } from '../../ui/controls';
-import { canCopyImage, canShareFiles, copyImage, downloadBlob, exportFilename, shareImage } from '../export/exportImage';
+import { getScene, SCENES } from '../../data/scenes';
+import { renderShot } from '../../render/renderShot';
+import { useStudio } from '../../store/studio';
+import { buttonPrimary, buttonSecondary, Chips } from '../../ui/controls';
+import { canCopyImage, canShareFiles, copyImage, downloadBlob, shareImage } from '../export/exportImage';
 import type { Skin } from '../skins/types';
+import { shotName, useShotContext } from './Gallery';
+import { buildShot, castForScene, shotFilename, shotKey, type ShotRef } from './shots';
 import { useRenderUrl } from './useRenderUrl';
 
 const PREVIEW_SIZE = 1024;
 
-export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotId }) {
+export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
   const { t } = useTranslation();
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const settings = useStudio((s) => s.settings);
+  const ctx = useShotContext(skin);
   const exportSize = useStudio((s) => s.exportSize);
   const setOpenShot = useStudio((s) => s.setOpenShot);
   const toggleSelected = useStudio((s) => s.toggleSelected);
+  const setCastSlot = useStudio((s) => s.setCastSlot);
   const selected = useStudio((s) => s.selection.includes(shotKey(shot)));
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const poseIndex = POSES.findIndex((p) => p.id === shot.poseId);
-  const pose = POSES[poseIndex];
-  const camera = CAMERAS.find((c) => c.id === shot.cameraId)!;
-  const filename = exportFilename(skin.name, pose.id, camera.id);
-  const name = t(`poses.${pose.id}`);
-  const { url, pending } = useRenderUrl({ skin, pose, camera, settings, size: PREVIEW_SIZE }, 0);
+  const spec = buildShot(shot, ctx, PREVIEW_SIZE);
+  const { url, pending } = useRenderUrl(spec, 0);
+  const name = shotName(t, shot);
+  const filename = shotFilename(shot, ctx);
+  const scene = shot.kind === 'scene' ? getScene(shot.id) : undefined;
 
   useEffect(() => {
     const dialog = dialogRef.current!;
@@ -35,14 +38,15 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotId }) {
     return () => dialog.close();
   }, []);
 
-  useEffect(() => setStatus(null), [shot.poseId, shot.cameraId]);
+  useEffect(() => setStatus(null), [shot.kind, shot.id, shot.cameraId]);
 
+  const ids = shot.kind === 'pose' ? POSES.map((p) => p.id) : SCENES.map((s) => s.id);
   const go = (delta: number) => {
-    const next = POSES[(poseIndex + delta + POSES.length) % POSES.length];
-    setOpenShot({ poseId: next.id, cameraId: shot.cameraId });
+    const index = ids.indexOf(shot.id);
+    setOpenShot({ ...shot, id: ids[(index + delta + ids.length) % ids.length] });
   };
 
-  const renderExport = () => renderPose({ skin, pose, camera, settings, size: exportSize });
+  const renderExport = () => renderShot(buildShot(shot, ctx, exportSize)!);
 
   const run = async (action: () => Promise<void>, done: string) => {
     setBusy(true);
@@ -64,12 +68,12 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotId }) {
       onClose={() => setOpenShot(null)}
       onClick={(e) => e.target === dialogRef.current && dialogRef.current.close()}
       onKeyDown={(e) => {
-        if (e.target instanceof HTMLInputElement) return;
+        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
         const rtl = document.documentElement.dir === 'rtl';
         if (e.key === 'ArrowRight') go(rtl ? -1 : 1);
         if (e.key === 'ArrowLeft') go(rtl ? 1 : -1);
       }}
-      className="m-auto w-[min(92vw,720px)] rounded-xl border border-edge bg-panel p-0 text-slate-100 backdrop:bg-black/70"
+      className="m-auto w-[min(94vw,760px)] rounded-xl border border-edge bg-panel p-0 text-slate-100 backdrop:bg-black/70"
     >
       <div className="flex items-center gap-2 border-b border-edge px-4 py-3">
         <h2 className="me-auto text-lg font-semibold">{name}</h2>
@@ -79,25 +83,48 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotId }) {
       </div>
 
       <div className="relative">
-        <div className="checker flex aspect-square max-h-[60vh] w-full items-center justify-center p-6">
+        <div className="checker flex aspect-square max-h-[55vh] w-full items-center justify-center p-6">
           {url && <img src={url} alt={name} className={`max-h-full max-w-full object-contain ${pending ? 'opacity-60' : ''}`} />}
         </div>
-        <button onClick={() => go(-1)} aria-label={t('dialog.previous')} className="absolute start-2 top-1/2 -translate-y-1/2 rounded-full bg-ink/80 px-3 py-2 text-xl hover:bg-ink">
+        <button onClick={() => go(-1)} aria-label={t('dialog.previous')} className="absolute inset-s-2 top-1/2 -translate-y-1/2 rounded-full bg-ink/80 px-3 py-2 text-xl hover:bg-ink">
           <span className="inline-block rtl:rotate-180">‹</span>
         </button>
-        <button onClick={() => go(1)} aria-label={t('dialog.next')} className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full bg-ink/80 px-3 py-2 text-xl hover:bg-ink">
+        <button onClick={() => go(1)} aria-label={t('dialog.next')} className="absolute inset-e-2 top-1/2 -translate-y-1/2 rounded-full bg-ink/80 px-3 py-2 text-xl hover:bg-ink">
           <span className="inline-block rtl:rotate-180">›</span>
         </button>
       </div>
 
       <div className="flex flex-col gap-3 p-4">
-        <Segmented
+        <Chips
           dir="ltr"
           label={t('studio.camera')}
           value={shot.cameraId}
           options={CAMERAS.map((c) => ({ value: c.id, label: t(`cameras.${c.id}`) }))}
-          onChange={(cameraId) => setOpenShot({ poseId: shot.poseId, cameraId })}
+          onChange={(cameraId) => setOpenShot({ ...shot, cameraId })}
         />
+
+        {scene && ctx.skins.length > 1 && (
+          <fieldset className="flex flex-wrap gap-3">
+            <legend className="mb-1 text-sm font-medium">{t('dialog.cast')}</legend>
+            {castForScene(scene, ctx).map((castSkin, i) => (
+              <label key={i} className="flex items-center gap-2 text-sm">
+                <span className="text-slate-400">{t('dialog.slot', { n: i + 1 })}</span>
+                <select
+                  value={castSkin.id}
+                  onChange={(e) => setCastSlot(scene.id, i, e.target.value, scene.slots.length)}
+                  className="rounded-md border border-edge bg-ink px-2 py-1"
+                >
+                  {ctx.skins.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </fieldset>
+        )}
+
         <div className="flex flex-wrap items-center gap-2">
           <button disabled={busy} className={buttonPrimary} onClick={() => run(async () => downloadBlob(await renderExport(), filename), t('dialog.downloaded'))}>
             {t('dialog.download')}

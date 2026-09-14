@@ -13,6 +13,8 @@ import {
 } from 'three';
 import type { SkinModel } from '../../features/skins/types';
 import type { Pose } from '../../data/poses/types';
+import { createItemObject } from '../props/meshes';
+import type { ItemId } from '../props/items';
 import { createSkinBoxGeometry } from './boxGeometry';
 import { getPartLayouts, type PartId } from './layout';
 
@@ -21,16 +23,27 @@ export type Lighting = 'flat' | 'shaded';
 export interface CharacterOptions {
   model: SkinModel;
   lighting: Lighting;
+  /** Render the second (hat/jacket/sleeves/pants) layer. Defaults to true. */
+  overlay?: boolean;
+}
+
+export interface HeldItems {
+  right?: ItemId | null;
+  left?: ItemId | null;
 }
 
 export class Character {
   readonly root = new Group();
   readonly meshes: Mesh[] = [];
+  readonly headMeshes: Mesh[] = [];
+  private readonly hands: Record<'right' | 'left', Group> = { right: new Group(), left: new Group() };
+  private readonly lighting: Lighting;
   private readonly joints = new Map<PartId, Group>();
   private readonly texture: Texture;
   private readonly materials: Material[];
 
   constructor(skin: ImageBitmap, options: CharacterOptions) {
+    this.lighting = options.lighting;
     this.texture = new Texture(skin);
     this.texture.flipY = false;
     this.texture.magFilter = NearestFilter;
@@ -50,13 +63,24 @@ export class Character {
       joint.name = part.id;
       joint.position.set(...part.pivot);
 
-      const base = new Mesh(createSkinBoxGeometry(part.size, part.uv), baseMaterial);
-      const overlay = new Mesh(createSkinBoxGeometry(part.size, part.overlayUv, part.overlayInflate), overlayMaterial);
-      overlay.renderOrder = 1;
-      for (const mesh of [base, overlay]) {
+      const layers = [new Mesh(createSkinBoxGeometry(part.size, part.uv), baseMaterial)];
+      if (options.overlay !== false) {
+        const overlay = new Mesh(createSkinBoxGeometry(part.size, part.overlayUv, part.overlayInflate), overlayMaterial);
+        overlay.renderOrder = 1;
+        layers.push(overlay);
+      }
+      for (const mesh of layers) {
         mesh.position.set(...part.offset);
         joint.add(mesh);
         this.meshes.push(mesh);
+        if (part.id === 'head') this.headMeshes.push(mesh);
+      }
+
+      if (part.id === 'rightArm' || part.id === 'leftArm') {
+        // Grip point: inside the fist, near the bottom of the arm.
+        const hand = this.hands[part.id === 'rightArm' ? 'right' : 'left'];
+        hand.position.set(part.offset[0], -9, 0);
+        joint.add(hand);
       }
 
       this.joints.set(part.id, joint);
@@ -76,6 +100,17 @@ export class Character {
     const [rx, ry, rz] = pose.root?.rotation ?? [0, 0, 0];
     this.root.position.set(px, py, pz);
     this.root.rotation.set(MathUtils.degToRad(rx), MathUtils.degToRad(ry), MathUtils.degToRad(rz), 'XYZ');
+    this.root.updateMatrixWorld(true);
+  }
+
+  /** Replaces whatever the character is holding. Item geometry/materials are shared and not disposed here. */
+  setHeldItems(items: HeldItems = {}): void {
+    for (const side of ['right', 'left'] as const) {
+      const hand = this.hands[side];
+      hand.clear();
+      const id = items[side];
+      if (id) hand.add(createItemObject(id, this.lighting));
+    }
     this.root.updateMatrixWorld(true);
   }
 

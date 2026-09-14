@@ -1,0 +1,26 @@
+{
+  "id": "thumbsUp",
+  "category": "casual",
+  "bones": {
+    "head": [
+      0,
+      -10,
+      5
+    ],
+    "body": [
+      0,
+      -10,
+      0
+    ],
+    "rightArm": [
+      -95,
+      0,
+      20
+    ],
+    "leftArm": [
+      0,
+      0,
+      5
+    ]
+  }
+}

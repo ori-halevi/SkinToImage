@@ -1,0 +1,26 @@
+{
+  "id": "laugh",
+  "category": "emotion",
+  "bones": {
+    "head": [
+      -20,
+      0,
+      0
+    ],
+    "body": [
+      -15,
+      0,
+      0
+    ],
+    "rightArm": [
+      -35,
+      0,
+      25
+    ],
+    "leftArm": [
+      -35,
+      0,
+      -25
+    ]
+  }
+}

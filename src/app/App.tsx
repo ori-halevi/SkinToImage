@@ -2,21 +2,21 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES, setLanguage, type LanguageCode } from '../i18n';
 import { isWebGL2Supported } from '../render/renderer';
-import { useStudio } from '../store/studio';
+import { useActiveSkin, useStudio } from '../store/studio';
 import { UploadPanel } from '../features/skins/UploadPanel';
 import { Studio } from '../features/studio/Studio';
 
 export default function App() {
   const { t, i18n } = useTranslation();
-  const skin = useStudio((s) => s.skin);
-  const setSkin = useStudio((s) => s.setSkin);
+  const skin = useActiveSkin();
+  const clearSkins = useStudio((s) => s.clearSkins);
   const [webgl] = useState(isWebGL2Supported);
 
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-edge px-4 py-3">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <button className="text-lg font-bold tracking-tight" onClick={() => setSkin(null)} dir="ltr">
+          <button className="text-lg font-bold tracking-tight" onClick={clearSkins} dir="ltr">
             <span className="text-grass">■</span> SkinToImage
           </button>
           <div className="flex items-center gap-4">

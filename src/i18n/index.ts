@@ -44,6 +44,8 @@ void i18n.use(initReactI18next).init({
   lng: detectLanguage(),
   fallbackLng: 'en',
   interpolation: { escapeValue: false },
+  // Keys like "frames.16:9" contain colons; we don't use namespaces, so don't split on them.
+  nsSeparator: false,
 });
 
 applyDocumentLanguage(i18n.language);

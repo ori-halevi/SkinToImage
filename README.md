@@ -8,9 +8,10 @@ Turn a Minecraft-style skin into transparent, thumbnail-ready PNG renders — en
 
 ```bash
 npm install
-npm run dev      # dev server
-npm test         # unit tests
-npm run build    # type-check + production build to dist/
+npm run dev        # dev server
+npm test           # unit tests (Vitest)
+npm run test:e2e   # end-to-end tests (Playwright; builds must exist: run `npm run build` first)
+npm run build      # type-check + production build to dist/
 ```
 
 ## Deploy (GitHub Pages)
@@ -24,8 +25,10 @@ npm run build    # type-check + production build to dist/
 | Path | What |
 |---|---|
 | [docs/SPEC.md](docs/SPEC.md) | Product spec (Hebrew) |
-| `src/render/rig/` | Character model: part layout, UV-mapped box geometry |
-| `src/render/renderPose.ts` | Render pipeline: pose → camera fit → WebGL → outline → trim → PNG |
-| `src/render/postprocess/` | Outline (distance transform) and auto-trim — pure, unit-tested |
+| `src/render/renderShot.ts` | Render pipeline: actors + props → camera fit → WebGL → outline → trim → shadow/glow → frame → PNG |
+| `src/render/rig/` | Character model: part layout, UV-mapped box geometry, held items |
+| `src/render/props/` | Original pixel-art items and block textures, generated in code |
+| `src/render/postprocess/` | Outline (distance transform), trim, effects, background frames |
 | `src/data/poses/*.json` | Pose definitions (joint rotations in degrees) |
-| `src/features/` | Skin loading, export, and UI |
+| `src/data/scenes.ts` | Multi-character scenes with props |
+| `src/features/` | Skin loading (file / username), studio UI, export |

@@ -1,0 +1,38 @@
+{
+  "id": "floss",
+  "category": "funny",
+  "bones": {
+    "body": [
+      0,
+      0,
+      -8
+    ],
+    "rightArm": [
+      -20,
+      0,
+      35
+    ],
+    "leftArm": [
+      20,
+      0,
+      35
+    ],
+    "rightLeg": [
+      0,
+      0,
+      -4
+    ],
+    "leftLeg": [
+      0,
+      0,
+      4
+    ]
+  },
+  "root": {
+    "rotation": [
+      0,
+      0,
+      5
+    ]
+  }
+}

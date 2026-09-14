@@ -1,4 +1,5 @@
 import { detectModel } from './detectModel';
+import { upgradeLegacySkin } from './legacySkin';
 import type { Skin, SkinModel } from './types';
 import { validateDimensions, validateFileType, type SkinValidationError } from './validation';
 
@@ -11,6 +12,9 @@ export class SkinLoadError extends Error {
 export interface SkinOverrides {
   id?: string;
   model?: SkinModel;
+  showOverlay?: boolean;
+  /** Convert legacy 64×32 skins instead of rejecting them (used for skins fetched by username). */
+  upgradeLegacy?: boolean;
 }
 
 export async function loadSkinFromBlob(blob: Blob, name: string, overrides: SkinOverrides = {}): Promise<Skin> {
@@ -24,7 +28,13 @@ export async function loadSkinFromBlob(blob: Blob, name: string, overrides: Skin
     throw new SkinLoadError('not-png');
   }
 
-  const dimensionError = validateDimensions(bitmap.width, bitmap.height);
+  let dimensionError = validateDimensions(bitmap.width, bitmap.height);
+  if (dimensionError === 'legacy-64x32' && overrides.upgradeLegacy) {
+    blob = await upgradeLegacySkin(bitmap);
+    bitmap.close();
+    bitmap = await createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
+    dimensionError = validateDimensions(bitmap.width, bitmap.height);
+  }
   if (dimensionError) {
     bitmap.close();
     throw new SkinLoadError(dimensionError);
@@ -42,6 +52,7 @@ export async function loadSkinFromBlob(blob: Blob, name: string, overrides: Skin
     size: bitmap.width,
     blob,
     bitmap,
+    showOverlay: overrides.showOverlay ?? true,
     lastUsedAt: Date.now(),
   };
 }

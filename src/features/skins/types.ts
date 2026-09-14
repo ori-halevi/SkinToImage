@@ -10,6 +10,8 @@ export interface Skin {
   /** Original PNG, kept for persistence. */
   blob: Blob;
   bitmap: ImageBitmap;
+  /** Render the second layer (hat, jacket, sleeves, pants). */
+  showOverlay: boolean;
   lastUsedAt: number;
 }
 

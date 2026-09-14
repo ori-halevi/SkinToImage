@@ -1,0 +1,26 @@
+{
+  "id": "handsBehind",
+  "category": "casual",
+  "bones": {
+    "head": [
+      -5,
+      0,
+      0
+    ],
+    "body": [
+      -3,
+      0,
+      0
+    ],
+    "rightArm": [
+      25,
+      0,
+      12
+    ],
+    "leftArm": [
+      25,
+      0,
+      -12
+    ]
+  }
+}

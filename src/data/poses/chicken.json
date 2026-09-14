@@ -1,0 +1,31 @@
+{
+  "id": "chicken",
+  "category": "funny",
+  "bones": {
+    "head": [
+      -20,
+      0,
+      0
+    ],
+    "body": [
+      15,
+      0,
+      0
+    ],
+    "rightArm": [
+      20,
+      0,
+      -35
+    ],
+    "leftArm": [
+      20,
+      0,
+      35
+    ],
+    "rightLeg": [
+      -40,
+      0,
+      0
+    ]
+  }
+}

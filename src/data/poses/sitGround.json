@@ -1,0 +1,38 @@
+{
+  "id": "sitGround",
+  "category": "casual",
+  "bones": {
+    "body": [
+      -20,
+      0,
+      0
+    ],
+    "rightArm": [
+      40,
+      0,
+      -10
+    ],
+    "leftArm": [
+      40,
+      0,
+      10
+    ],
+    "rightLeg": [
+      -90,
+      10,
+      0
+    ],
+    "leftLeg": [
+      -90,
+      -10,
+      0
+    ]
+  },
+  "root": {
+    "position": [
+      0,
+      -12,
+      0
+    ]
+  }
+}

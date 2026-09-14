@@ -1,0 +1,36 @@
+{
+  "id": "punch",
+  "category": "action",
+  "bones": {
+    "head": [
+      0,
+      -20,
+      0
+    ],
+    "body": [
+      0,
+      25,
+      0
+    ],
+    "rightArm": [
+      -90,
+      0,
+      0
+    ],
+    "leftArm": [
+      -70,
+      0,
+      -30
+    ],
+    "rightLeg": [
+      15,
+      0,
+      0
+    ],
+    "leftLeg": [
+      -20,
+      0,
+      0
+    ]
+  }
+}

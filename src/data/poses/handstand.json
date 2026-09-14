@@ -1,0 +1,43 @@
+{
+  "id": "handstand",
+  "category": "funny",
+  "bones": {
+    "head": [
+      -10,
+      0,
+      0
+    ],
+    "rightArm": [
+      180,
+      0,
+      -8
+    ],
+    "leftArm": [
+      180,
+      0,
+      8
+    ],
+    "rightLeg": [
+      0,
+      0,
+      -15
+    ],
+    "leftLeg": [
+      0,
+      0,
+      15
+    ]
+  },
+  "root": {
+    "position": [
+      0,
+      34,
+      0
+    ],
+    "rotation": [
+      0,
+      0,
+      180
+    ]
+  }
+}

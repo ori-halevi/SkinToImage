@@ -1,8 +1,25 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Download, type Page } from '@playwright/test';
 import { unzipSync } from 'fflate';
 import { readFile } from 'node:fs/promises';
 
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47];
+const POSE_COUNT = 43;
+const SCENE_COUNT = 12;
+
+async function readDownload(download: Download): Promise<Uint8Array> {
+  return new Uint8Array(await readFile((await download.path())!));
+}
+
+/** Width/height from a PNG's IHDR chunk. */
+function pngSize(data: Uint8Array): [number, number] {
+  const view = new DataView(data.buffer, data.byteOffset);
+  return [view.getUint32(16), view.getUint32(20)];
+}
+
+async function loadSample(page: Page) {
+  await page.getByRole('button', { name: 'Try a sample skin' }).click();
+  await expect(page.locator('[data-testid^="shot-"]')).toHaveCount(POSE_COUNT);
+}
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('lang', 'en'));
@@ -10,27 +27,25 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('sample skin → gallery → ZIP download', async ({ page }) => {
-  await page.getByRole('button', { name: 'Try a sample skin' }).click();
-
-  const cards = page.locator('[data-testid^="shot-"]');
-  await expect(cards).toHaveCount(16);
+  await loadSample(page);
   await expect(page.locator('[data-testid="shot-wave"] img')).toBeVisible();
 
   await page.getByRole('checkbox', { name: 'Select Wave' }).check();
   await page.getByRole('checkbox', { name: 'Select Dab' }).check();
   await expect(page.getByText('2 selected')).toBeVisible();
 
+  await page.locator('summary', { hasText: 'Export' }).click();
   await page.getByRole('button', { name: '1024px', exact: true }).click();
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download ZIP' }).click()]);
-  expect(download.suggestedFilename()).toBe('explorer_poses.zip');
+  expect(download.suggestedFilename()).toBe('explorer_images.zip');
 
-  const files = unzipSync(new Uint8Array(await readFile((await download.path())!)));
+  const files = unzipSync(await readDownload(download));
   expect(Object.keys(files).sort()).toEqual(['explorer_dab_left.png', 'explorer_wave_left.png']);
   for (const data of Object.values(files)) expect(Array.from(data.slice(0, 4))).toEqual(PNG_SIGNATURE);
 });
 
 test('single image download from the dialog', async ({ page }) => {
-  await page.getByRole('button', { name: 'Try a sample skin' }).click();
+  await loadSample(page);
   await page.getByRole('button', { name: 'Open Shocked' }).click();
 
   const dialog = page.getByRole('dialog', { name: 'Shocked' });
@@ -44,18 +59,67 @@ test('single image download from the dialog', async ({ page }) => {
   await expect(dialog).toBeHidden();
 });
 
+test('16:9 background frame produces a 16:9 image', async ({ page }) => {
+  await loadSample(page);
+  await page.locator('summary', { hasText: 'Background' }).click();
+  await page.getByRole('button', { name: 'Sunburst' }).click();
+  await page.getByRole('button', { name: '16:9' }).click();
+  await page.locator('summary', { hasText: 'Export' }).click();
+  await page.getByRole('button', { name: '1024px', exact: true }).click();
+
+  await page.getByRole('button', { name: 'Open Wave' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Wave' });
+  const [download] = await Promise.all([page.waitForEvent('download'), dialog.getByRole('button', { name: 'Download PNG' }).click()]);
+  expect(pngSize(await readDownload(download))).toEqual([1024, 576]);
+});
+
+test('scenes with two skins', async ({ page }) => {
+  await loadSample(page);
+  await page.getByRole('button', { name: 'Add skin' }).click();
+  await page.getByRole('dialog', { name: 'Add a skin' }).getByRole('button', { name: 'Try a sample skin' }).click();
+  await expect(page.getByRole('button', { name: /^Use explorer/ })).toHaveCount(2);
+
+  await page.getByRole('tab', { name: 'Scenes' }).click();
+  await expect(page.locator('[data-testid^="shot-"]')).toHaveCount(SCENE_COUNT);
+  await expect(page.locator('[data-testid="shot-fight"] img')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Open Sword fight' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Sword fight' });
+  await expect(dialog.getByText('Characters')).toBeVisible();
+  const [download] = await Promise.all([page.waitForEvent('download'), dialog.getByRole('button', { name: 'Download PNG' }).click()]);
+  expect(download.suggestedFilename()).toBe('explorer_fight_left.png');
+});
+
+test('loads a skin by username (mocked services)', async ({ page }) => {
+  const skinPng = await readFile('public/favicon.png'); // any valid 64×64 PNG works as a skin
+  const textures = Buffer.from(JSON.stringify({ textures: { SKIN: { url: 'https://textures.test/skin', metadata: { model: 'slim' } } } })).toString('base64');
+  await page.route('https://playerdb.co/**', (route) =>
+    route.fulfill({
+      json: { success: true, code: 'player.found', data: { player: { username: 'TestPlayer', properties: [{ name: 'textures', value: textures }] } } },
+      headers: { 'Access-Control-Allow-Origin': '*' },
+    }),
+  );
+  await page.route('https://textures.test/**', (route) =>
+    route.fulfill({ body: skinPng, contentType: 'image/png', headers: { 'Access-Control-Allow-Origin': '*' } }),
+  );
+
+  await page.getByLabel('Java username').fill('testplayer');
+  await page.getByRole('button', { name: 'Load', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Use TestPlayer' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Slim', exact: true })).toHaveAttribute('aria-pressed', 'true');
+});
+
 test('rejects invalid files with a clear error', async ({ page }) => {
   await page.getByTestId('skin-input').setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: Buffer.from([1, 2, 3]) });
   await expect(page.getByRole('alert')).toHaveText('Only PNG skin files are supported.');
 });
 
 test('remembers recent skins', async ({ page }) => {
-  await page.getByRole('button', { name: 'Try a sample skin' }).click();
-  await expect(page.locator('[data-testid^="shot-"]')).toHaveCount(16);
-  await page.getByRole('button', { name: 'Change skin' }).click();
+  await loadSample(page);
+  await page.getByRole('button', { name: 'SkinToImage' }).click();
   await expect(page.getByRole('heading', { name: 'Recent skins' })).toBeVisible();
   await page.getByRole('button', { name: 'explorer', exact: true }).click();
-  await expect(page.locator('[data-testid^="shot-"]')).toHaveCount(16);
+  await expect(page.locator('[data-testid^="shot-"]')).toHaveCount(POSE_COUNT);
 });
 
 test('switches to Hebrew with right-to-left layout', async ({ page }) => {

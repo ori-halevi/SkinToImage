@@ -12,7 +12,13 @@
     "sample": "לנסות סקין לדוגמה",
     "paste": "…או להדביק תמונה עם Ctrl+V",
     "recent": "סקינים אחרונים",
-    "remove": "הסרת {{name}}"
+    "remove": "הסרת {{name}}",
+    "username": "שם משתמש ב-Java",
+    "loadUsername": "טעינה",
+    "loading": "טוען…",
+    "or": "או",
+    "addTitle": "הוספת סקין",
+    "usernameNote": "שם המשתמש נשלח ל-playerdb.co / minotar.net כדי למצוא את הסקין."
   },
   "errors": {
     "not-png": "אפשר להעלות רק קבצי PNG.",
@@ -22,11 +28,13 @@
     "unknown": "משהו השתבש בקריאת הקובץ.",
     "webgl": "הדפדפן שלך לא תומך בתלת-ממד. נסו גרסה עדכנית של Chrome, Firefox או Safari.",
     "render": "יצירת התמונה נכשלה.",
-    "action": "זה לא עבד. נסו להוריד את התמונה במקום."
+    "action": "זה לא עבד. נסו להוריד את התמונה במקום.",
+    "invalid-username": "שם משתמש הוא 3–16 אותיות באנגלית, ספרות או קו תחתון.",
+    "user-not-found": "לא מצאנו שחקן בשם הזה.",
+    "network": "אין חיבור לשירותי הסקינים. בדקו את החיבור ונסו שוב."
   },
   "studio": {
     "skinName": "שם הסקין",
-    "change": "החלפת סקין",
     "armModel": "סוג ידיים",
     "detected": "זוהה: {{model}}",
     "classic": "רגיל",
@@ -42,7 +50,35 @@
     "outlineColor": "צבע המסגרת",
     "exportSize": "גודל להורדה",
     "settings": "הגדרות",
-    "preview": "תצוגה תלת-ממדית. גררו כדי לסובב."
+    "preview": "תצוגה תלת-ממדית. גררו כדי לסובב.",
+    "skins": "סקינים",
+    "addSkin": "הוספת סקין",
+    "removeSkin": "הסרת {{name}}",
+    "activeSkin": "שימוש ב-{{name}}",
+    "maxSkins": "עד {{max}} סקינים",
+    "overlay": "שכבה שנייה (כובע, ז׳קט)",
+    "character": "דמות",
+    "effects": "אפקטים",
+    "backgroundSection": "רקע",
+    "export": "הורדה",
+    "heldItem": "חפץ ביד",
+    "ground": "קרקע",
+    "mirror": "היפוך תמונה",
+    "shadow": "צל",
+    "shadowOpacity": "כהות הצל",
+    "shadowBlur": "טשטוש הצל",
+    "shadowDistance": "מרחק הצל",
+    "glow": "זוהר",
+    "glowColor": "צבע הזוהר",
+    "glowSize": "גודל הזוהר",
+    "background": "רקע",
+    "bgColor": "צבע",
+    "bgFrom": "צבע עליון",
+    "bgTo": "צבע תחתון",
+    "bgRays": "צבע הקרניים",
+    "uploadImage": "בחירת תמונה",
+    "frame": "צורת התמונה",
+    "reset": "איפוס הגדרות"
   },
   "gallery": {
     "all": "הכול",
@@ -54,7 +90,11 @@
     "downloadZip": "הורדת ZIP",
     "zipProgress": "יוצר {{done}}/{{total}}…",
     "cancel": "ביטול",
-    "open": "פתיחת {{name}}"
+    "open": "פתיחת {{name}}",
+    "posesTab": "פוזות",
+    "scenesTab": "סצנות",
+    "downloadAll": "להוריד הכול",
+    "scenesHint": "הסצנות משתמשות בכל הסקינים שלך. אפשר להוסיף סקינים כדי למלא את כל הדמויות."
   },
   "categories": {
     "emotion": "רגשות",
@@ -73,7 +113,9 @@
     "shared": "שותף!",
     "select": "להוסיף ל-ZIP",
     "previous": "הפוזה הקודמת",
-    "next": "הפוזה הבאה"
+    "next": "הפוזה הבאה",
+    "cast": "דמויות",
+    "slot": "דמות {{n}}"
   },
   "poses": {
     "wave": "נפנוף",
@@ -91,11 +133,84 @@
     "crouch": "כריעה",
     "sit": "ישיבה",
     "fall": "נפילה",
-    "tpose": "T-Pose"
+    "tpose": "T-Pose",
+    "cry": "בוכה",
+    "angry": "כועס",
+    "sad": "עצוב",
+    "scared": "מפוחד",
+    "laugh": "צוחק",
+    "confused": "מבולבל",
+    "punch": "אגרוף",
+    "kick": "בעיטה",
+    "swordSwing": "הנפת חרב",
+    "guard": "התגוננות",
+    "throw": "זריקה",
+    "fly": "מעופף",
+    "aim": "מכוון",
+    "walk": "הליכה",
+    "armsCrossed": "ידיים שלובות",
+    "handsBehind": "ידיים מאחור",
+    "cheer": "עידוד",
+    "thumbsUp": "אגודל למעלה",
+    "sitGround": "ישיבה על הרצפה",
+    "selfie": "סלפי",
+    "bow": "קידה",
+    "zombie": "זומבי",
+    "floss": "פלוס",
+    "flex": "שרירים",
+    "ninjaRun": "ריצת נינג׳ה",
+    "handstand": "עמידת ידיים",
+    "chicken": "תרנגולת"
   },
   "cameras": {
     "left": "שמאל",
     "front": "חזית",
-    "right": "ימין"
+    "right": "ימין",
+    "hero": "גיבור",
+    "closeUp": "תקריב",
+    "wide": "רחב",
+    "back": "מאחור"
+  },
+  "items": {
+    "none": "בלי",
+    "sword": "חרב",
+    "pickaxe": "מכוש",
+    "axe": "גרזן",
+    "bow": "קשת",
+    "torch": "לפיד"
+  },
+  "grounds": {
+    "none": "בלי",
+    "grass": "דשא",
+    "stone": "אבן",
+    "planks": "עץ",
+    "sand": "חול"
+  },
+  "backgrounds": {
+    "transparent": "בלי",
+    "color": "צבע",
+    "gradient": "מעבר צבע",
+    "sunburst": "קרני שמש",
+    "image": "תמונה"
+  },
+  "frames": {
+    "fit": "צמוד",
+    "16:9": "16:9",
+    "1:1": "1:1",
+    "9:16": "9:16"
+  },
+  "scenes": {
+    "faceOff": "עימות",
+    "fight": "קרב חרבות",
+    "chase": "מרדף",
+    "backToBack": "גב אל גב",
+    "squad": "חוליה של 3",
+    "squad4": "חוליה של 4",
+    "treasure": "אוצר!",
+    "onChair": "על כיסא",
+    "kingOfTheHill": "מלך הגבעה",
+    "explosivePanic": "פאניקה",
+    "diamondFind": "יהלומים!",
+    "campfire": "בילוי"
   }
 }

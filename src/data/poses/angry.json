@@ -1,0 +1,36 @@
+{
+  "id": "angry",
+  "category": "emotion",
+  "bones": {
+    "head": [
+      -10,
+      0,
+      0
+    ],
+    "body": [
+      10,
+      0,
+      0
+    ],
+    "rightArm": [
+      20,
+      0,
+      -15
+    ],
+    "leftArm": [
+      20,
+      0,
+      15
+    ],
+    "rightLeg": [
+      0,
+      0,
+      -6
+    ],
+    "leftLeg": [
+      0,
+      0,
+      6
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "bow",
+  "category": "casual",
+  "bones": {
+    "head": [
+      10,
+      0,
+      0
+    ],
+    "body": [
+      60,
+      0,
+      0
+    ],
+    "rightArm": [
+      -70,
+      0,
+      35
+    ],
+    "leftArm": [
+      30,
+      0,
+      15
+    ]
+  }
+}

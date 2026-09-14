@@ -1,0 +1,26 @@
+{
+  "id": "cheer",
+  "category": "casual",
+  "bones": {
+    "head": [
+      -10,
+      0,
+      0
+    ],
+    "rightArm": [
+      -10,
+      0,
+      -150
+    ],
+    "leftArm": [
+      -10,
+      0,
+      150
+    ],
+    "rightLeg": [
+      -30,
+      0,
+      -10
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "throw",
+  "category": "action",
+  "bones": {
+    "body": [
+      -5,
+      -20,
+      0
+    ],
+    "rightArm": [
+      150,
+      0,
+      -10
+    ],
+    "leftArm": [
+      -80,
+      0,
+      0
+    ],
+    "rightLeg": [
+      -20,
+      0,
+      0
+    ],
+    "leftLeg": [
+      20,
+      0,
+      0
+    ]
+  }
+}

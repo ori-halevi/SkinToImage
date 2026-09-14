@@ -1,0 +1,36 @@
+{
+  "id": "zombie",
+  "category": "funny",
+  "bones": {
+    "head": [
+      10,
+      0,
+      10
+    ],
+    "body": [
+      5,
+      0,
+      0
+    ],
+    "rightArm": [
+      -90,
+      0,
+      0
+    ],
+    "leftArm": [
+      -90,
+      0,
+      0
+    ],
+    "rightLeg": [
+      -10,
+      0,
+      0
+    ],
+    "leftLeg": [
+      10,
+      0,
+      0
+    ]
+  }
+}

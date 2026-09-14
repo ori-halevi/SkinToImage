@@ -1,0 +1,36 @@
+{
+  "id": "ninjaRun",
+  "category": "funny",
+  "bones": {
+    "head": [
+      -25,
+      0,
+      0
+    ],
+    "body": [
+      30,
+      0,
+      0
+    ],
+    "rightArm": [
+      60,
+      0,
+      -5
+    ],
+    "leftArm": [
+      60,
+      0,
+      5
+    ],
+    "rightLeg": [
+      -40,
+      0,
+      0
+    ],
+    "leftLeg": [
+      35,
+      0,
+      0
+    ]
+  }
+}

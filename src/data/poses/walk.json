@@ -1,0 +1,26 @@
+{
+  "id": "walk",
+  "category": "action",
+  "bones": {
+    "rightArm": [
+      25,
+      0,
+      0
+    ],
+    "leftArm": [
+      -25,
+      0,
+      0
+    ],
+    "rightLeg": [
+      -25,
+      0,
+      0
+    ],
+    "leftLeg": [
+      25,
+      0,
+      0
+    ]
+  }
+}

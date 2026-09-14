@@ -8,6 +8,7 @@ interface StoredSkin {
   id: string;
   name: string;
   model: SkinModel;
+  showOverlay?: boolean;
   blob: Blob;
   lastUsedAt: number;
 }
@@ -22,7 +23,7 @@ export async function listRecentSkins(): Promise<Skin[]> {
     const skins = await Promise.all(
       stored.slice(0, MAX_RECENT_SKINS).map(async (s) => {
         try {
-          const skin = await loadSkinFromBlob(s.blob, s.name, { id: s.id, model: s.model });
+          const skin = await loadSkinFromBlob(s.blob, s.name, { id: s.id, model: s.model, showOverlay: s.showOverlay });
           return { ...skin, lastUsedAt: s.lastUsedAt };
         } catch {
           await del(s.id, store);
@@ -38,7 +39,14 @@ export async function listRecentSkins(): Promise<Skin[]> {
 
 export async function saveRecentSkin(skin: Skin): Promise<void> {
   try {
-    const stored: StoredSkin = { id: skin.id, name: skin.name, model: skin.model, blob: skin.blob, lastUsedAt: skin.lastUsedAt };
+    const stored: StoredSkin = {
+      id: skin.id,
+      name: skin.name,
+      model: skin.model,
+      showOverlay: skin.showOverlay,
+      blob: skin.blob,
+      lastUsedAt: skin.lastUsedAt,
+    };
     await set(skin.id, stored, store);
     const all = (await entries<string, StoredSkin>(store)).map(([, s]) => s).sort((a, b) => b.lastUsedAt - a.lastUsedAt);
     await Promise.all(all.slice(MAX_RECENT_SKINS).map((s) => del(s.id, store)));

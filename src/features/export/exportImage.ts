@@ -24,7 +24,3 @@ export function canShareFiles(): boolean {
 export async function shareImage(blob: Blob, filename: string): Promise<void> {
   await navigator.share({ files: [new File([blob], filename, { type: 'image/png' })] });
 }
-
-export function exportFilename(skinName: string, poseId: string, cameraId: string): string {
-  return `${skinName}_${poseId}_${cameraId}.png`;
-}

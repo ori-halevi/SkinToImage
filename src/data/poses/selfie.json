@@ -1,0 +1,26 @@
+{
+  "id": "selfie",
+  "category": "casual",
+  "bones": {
+    "head": [
+      -10,
+      -10,
+      0
+    ],
+    "body": [
+      0,
+      -10,
+      0
+    ],
+    "rightArm": [
+      -120,
+      0,
+      10
+    ],
+    "leftArm": [
+      -60,
+      0,
+      -30
+    ]
+  }
+}

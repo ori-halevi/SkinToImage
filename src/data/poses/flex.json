@@ -1,0 +1,31 @@
+{
+  "id": "flex",
+  "category": "funny",
+  "bones": {
+    "head": [
+      -5,
+      0,
+      0
+    ],
+    "rightArm": [
+      -20,
+      0,
+      -120
+    ],
+    "leftArm": [
+      -20,
+      0,
+      120
+    ],
+    "rightLeg": [
+      0,
+      0,
+      -8
+    ],
+    "leftLeg": [
+      0,
+      0,
+      8
+    ]
+  }
+}

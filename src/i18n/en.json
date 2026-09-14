@@ -12,7 +12,13 @@
     "sample": "Try a sample skin",
     "paste": "…or paste an image with Ctrl+V",
     "recent": "Recent skins",
-    "remove": "Remove {{name}}"
+    "remove": "Remove {{name}}",
+    "username": "Java username",
+    "loadUsername": "Load",
+    "loading": "Loading…",
+    "or": "or",
+    "addTitle": "Add a skin",
+    "usernameNote": "Your username is sent to playerdb.co / minotar.net to find the skin."
   },
   "errors": {
     "not-png": "Only PNG skin files are supported.",
@@ -22,11 +28,13 @@
     "unknown": "Something went wrong while reading this file.",
     "webgl": "Your browser doesn't support 3D rendering. Try the latest Chrome, Firefox or Safari.",
     "render": "Rendering failed.",
-    "action": "That didn't work. Try downloading instead."
+    "action": "That didn't work. Try downloading instead.",
+    "invalid-username": "Usernames are 3–16 letters, numbers or underscores.",
+    "user-not-found": "We couldn't find a player with that name.",
+    "network": "Couldn't reach the skin services. Check your connection and try again."
   },
   "studio": {
     "skinName": "Skin name",
-    "change": "Change skin",
     "armModel": "Arm model",
     "detected": "Detected: {{model}}",
     "classic": "Classic",
@@ -42,7 +50,35 @@
     "outlineColor": "Outline color",
     "exportSize": "Export size",
     "settings": "Settings",
-    "preview": "3D preview. Drag to rotate."
+    "preview": "3D preview. Drag to rotate.",
+    "skins": "Skins",
+    "addSkin": "Add skin",
+    "removeSkin": "Remove {{name}}",
+    "activeSkin": "Use {{name}}",
+    "maxSkins": "Up to {{max}} skins",
+    "overlay": "Second layer (hat, jacket)",
+    "character": "Character",
+    "effects": "Effects",
+    "backgroundSection": "Background",
+    "export": "Export",
+    "heldItem": "Item in hand",
+    "ground": "Ground",
+    "mirror": "Mirror image",
+    "shadow": "Drop shadow",
+    "shadowOpacity": "Shadow opacity",
+    "shadowBlur": "Shadow blur",
+    "shadowDistance": "Shadow distance",
+    "glow": "Glow",
+    "glowColor": "Glow color",
+    "glowSize": "Glow size",
+    "background": "Background",
+    "bgColor": "Color",
+    "bgFrom": "Top color",
+    "bgTo": "Bottom color",
+    "bgRays": "Rays color",
+    "uploadImage": "Choose image",
+    "frame": "Image shape",
+    "reset": "Reset settings"
   },
   "gallery": {
     "all": "All",
@@ -54,7 +90,11 @@
     "downloadZip": "Download ZIP",
     "zipProgress": "Rendering {{done}}/{{total}}…",
     "cancel": "Cancel",
-    "open": "Open {{name}}"
+    "open": "Open {{name}}",
+    "posesTab": "Poses",
+    "scenesTab": "Scenes",
+    "downloadAll": "Download all",
+    "scenesHint": "Scenes use all your skins. Add more skins to fill every character."
   },
   "categories": {
     "emotion": "Emotions",
@@ -73,7 +113,9 @@
     "shared": "Shared!",
     "select": "Add to ZIP",
     "previous": "Previous pose",
-    "next": "Next pose"
+    "next": "Next pose",
+    "cast": "Characters",
+    "slot": "Character {{n}}"
   },
   "poses": {
     "wave": "Wave",
@@ -91,11 +133,84 @@
     "crouch": "Crouch",
     "sit": "Sit",
     "fall": "Fall",
-    "tpose": "T-Pose"
+    "tpose": "T-Pose",
+    "cry": "Cry",
+    "angry": "Angry",
+    "sad": "Sad",
+    "scared": "Scared",
+    "laugh": "Laugh",
+    "confused": "Confused",
+    "punch": "Punch",
+    "kick": "Kick",
+    "swordSwing": "Sword swing",
+    "guard": "Guard",
+    "throw": "Throw",
+    "fly": "Fly",
+    "aim": "Aim",
+    "walk": "Walk",
+    "armsCrossed": "Arms crossed",
+    "handsBehind": "Hands behind",
+    "cheer": "Cheer",
+    "thumbsUp": "Thumbs up",
+    "sitGround": "Sit on ground",
+    "selfie": "Selfie",
+    "bow": "Take a bow",
+    "zombie": "Zombie",
+    "floss": "Floss",
+    "flex": "Flex",
+    "ninjaRun": "Ninja run",
+    "handstand": "Handstand",
+    "chicken": "Chicken"
   },
   "cameras": {
     "left": "Left",
     "front": "Front",
-    "right": "Right"
+    "right": "Right",
+    "hero": "Hero",
+    "closeUp": "Close-up",
+    "wide": "Wide",
+    "back": "Back"
+  },
+  "items": {
+    "none": "None",
+    "sword": "Sword",
+    "pickaxe": "Pickaxe",
+    "axe": "Axe",
+    "bow": "Bow",
+    "torch": "Torch"
+  },
+  "grounds": {
+    "none": "None",
+    "grass": "Grass",
+    "stone": "Stone",
+    "planks": "Planks",
+    "sand": "Sand"
+  },
+  "backgrounds": {
+    "transparent": "None",
+    "color": "Color",
+    "gradient": "Gradient",
+    "sunburst": "Sunburst",
+    "image": "Image"
+  },
+  "frames": {
+    "fit": "Tight",
+    "16:9": "16:9",
+    "1:1": "1:1",
+    "9:16": "9:16"
+  },
+  "scenes": {
+    "faceOff": "Face-off",
+    "fight": "Sword fight",
+    "chase": "Chase",
+    "backToBack": "Back to back",
+    "squad": "Squad of 3",
+    "squad4": "Squad of 4",
+    "treasure": "Treasure!",
+    "onChair": "On a chair",
+    "kingOfTheHill": "King of the hill",
+    "explosivePanic": "Explosive panic",
+    "diamondFind": "Diamonds!",
+    "campfire": "Hangout"
   }
 }
