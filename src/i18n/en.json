@@ -103,7 +103,9 @@
     "posesTab": "Poses",
     "scenesTab": "Scenes",
     "downloadAll": "Download all",
-    "scenesHint": "Scenes use all your skins. Add more skins to fill every character."
+    "scenesHint": "Scenes use all your skins. Add up to 6 skins to fill every character.",
+    "castCount_one": "{{count}} character",
+    "castCount_other": "{{count}} characters"
   },
   "categories": {
     "emotion": "Emotions",
@@ -221,7 +223,28 @@
     "kingOfTheHill": "King of the hill",
     "explosivePanic": "Explosive panic",
     "diamondFind": "Diamonds!",
-    "campfire": "Hangout"
+    "campfire": "Hangout",
+    "miner": "Miner",
+    "lumberjack": "Lumberjack",
+    "archer": "Archer",
+    "goldHero": "Golden hero",
+    "caveExplorer": "Cave explorer",
+    "danceDuo": "Dance duo",
+    "lookAtThis": "Look at this!",
+    "knockout": "Knockout",
+    "photobomb": "Photobomb",
+    "archeryDuel": "Bow vs sword",
+    "dancers": "Dance crew",
+    "podium": "Podium",
+    "argument": "Argument",
+    "runaway": "Run away!",
+    "zombieHorde": "Zombie horde",
+    "swordSquad": "Battle squad",
+    "party": "Party",
+    "crew": "The crew",
+    "teamPhoto": "Team photo",
+    "bigBattle": "Big battle",
+    "celebration": "Celebration"
   },
   "overlayParts": {
     "head": "Hat",

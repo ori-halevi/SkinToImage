@@ -13,7 +13,7 @@ export { DEFAULT_SETTINGS };
 
 export const EXPORT_SIZES = [1024, 2048, 4096] as const;
 export type ExportSize = (typeof EXPORT_SIZES)[number];
-export const MAX_ACTIVE_SKINS = 4;
+export const MAX_ACTIVE_SKINS = 6;
 export const DEFAULT_CAMERA_ID: CameraId = 'left';
 export const DEFAULT_EXPORT_SIZE: ExportSize = 2048;
 
@@ -29,6 +29,8 @@ interface StudioState {
   exportSize: ExportSize;
   mode: ShotKind;
   category: PoseCategory | 'all';
+  /** Scenes filter: number of characters, or all. */
+  sceneSize: number | 'all';
   /** Selected shot keys, in selection order. */
   selection: string[];
   openShot: ShotRef | null;
@@ -47,6 +49,7 @@ interface StudioState {
   setExportSize: (size: ExportSize) => void;
   setMode: (mode: ShotKind) => void;
   setCategory: (category: PoseCategory | 'all') => void;
+  setSceneSize: (size: number | 'all') => void;
   toggleSelected: (shot: ShotRef) => void;
   setSelection: (keys: string[]) => void;
   setOpenShot: (shot: ShotRef | null) => void;
@@ -65,6 +68,7 @@ export const useStudio = create<StudioState>()(
       exportSize: DEFAULT_EXPORT_SIZE,
       mode: 'pose',
       category: 'all',
+      sceneSize: 'all',
       selection: [],
       openShot: null,
       addSkinOpen: false,
@@ -112,6 +116,7 @@ export const useStudio = create<StudioState>()(
       setExportSize: (exportSize) => set({ exportSize }),
       setMode: (mode) => set({ mode }),
       setCategory: (category) => set({ category }),
+      setSceneSize: (sceneSize) => set({ sceneSize }),
       toggleSelected: (shot) =>
         set((s) => {
           const key = shotKey(shot);

@@ -67,7 +67,8 @@ export function addLights(scene: Object3D, cameraDirection: Vector3): void {
 
 // ---------- Character cache ----------
 
-const CHARACTER_CACHE_LIMIT = 8;
+// Enough for a 6-character scene plus the single-character gallery without thrashing.
+const CHARACTER_CACHE_LIMIT = 12;
 const characters = new Map<string, Character>();
 
 /** `occurrence` distinguishes the same skin appearing more than once in a shot. */

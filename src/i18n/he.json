@@ -103,8 +103,11 @@
     "posesTab": "פוזות",
     "scenesTab": "סצנות",
     "downloadAll": "הורדת הכול",
-    "scenesHint": "הסצנות משתמשות בכל הסקינים שלך. אפשר להוסיף סקינים כדי למלא את כל הדמויות.",
-    "selected_two": "נבחרו 2 תמונות"
+    "scenesHint": "הסצנות משתמשות בכל הסקינים שלך. אפשר להוסיף עד 6 סקינים כדי למלא את כל הדמויות.",
+    "selected_two": "נבחרו 2 תמונות",
+    "castCount_one": "דמות אחת",
+    "castCount_two": "2 דמויות",
+    "castCount_other": "{{count}} דמויות"
   },
   "categories": {
     "emotion": "רגשות",
@@ -222,7 +225,28 @@
     "kingOfTheHill": "מלך הגבעה",
     "explosivePanic": "פאניקה",
     "diamondFind": "יהלומים!",
-    "campfire": "בילוי"
+    "campfire": "בילוי",
+    "miner": "כורה",
+    "lumberjack": "חוטב עצים",
+    "archer": "קשת",
+    "goldHero": "גיבור הזהב",
+    "caveExplorer": "חוקר מערות",
+    "danceDuo": "צמד רקדנים",
+    "lookAtThis": "תראה את זה!",
+    "knockout": "נוקאאוט",
+    "photobomb": "פוטובומב",
+    "archeryDuel": "קשת נגד חרב",
+    "dancers": "להקת ריקוד",
+    "podium": "פודיום",
+    "argument": "ויכוח",
+    "runaway": "לברוח!",
+    "zombieHorde": "המון זומבים",
+    "swordSquad": "יחידת קרב",
+    "party": "מסיבה",
+    "crew": "החבר׳ה",
+    "teamPhoto": "תמונה קבוצתית",
+    "bigBattle": "קרב גדול",
+    "celebration": "חגיגה"
   },
   "overlayParts": {
     "head": "כובע",

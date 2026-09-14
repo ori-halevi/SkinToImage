@@ -56,11 +56,11 @@ describe('poses', () => {
 });
 
 describe('scenes', () => {
-  it('reference existing poses, items and props, with 1–4 characters', () => {
+  it('reference existing poses, items and props, with 1–6 characters', () => {
     expect(new Set(SCENES.map((s) => s.id)).size).toBe(SCENES.length);
     for (const scene of SCENES) {
       expect(scene.slots.length).toBeGreaterThanOrEqual(1);
-      expect(scene.slots.length).toBeLessThanOrEqual(4);
+      expect(scene.slots.length).toBeLessThanOrEqual(6);
       for (const slot of scene.slots) {
         expect(getPose(slot.poseId), `${scene.id}: ${slot.poseId}`).toBeDefined();
         for (const item of Object.values(slot.items ?? {})) expect(ITEM_IDS).toContain(item);

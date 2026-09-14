@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CameraId } from '../../data/cameras';
 import { POSE_CATEGORIES, POSES } from '../../data/poses';
-import { SCENES } from '../../data/scenes';
+import { SCENE_SIZES, SCENES, sceneSize } from '../../data/scenes';
 import { renderShot } from '../../render/renderShot';
 import { isAbortError } from '../../render/renderer';
 import { useStudio } from '../../store/studio';
@@ -29,11 +29,13 @@ export function Gallery({ skin, cameraId }: { skin: Skin; cameraId: CameraId }) 
   const category = useStudio((s) => s.category);
   const setCategory = useStudio((s) => s.setCategory);
   const skinCount = useStudio((s) => s.skins.length);
+  const size = useStudio((s) => s.sceneSize);
+  const setSceneSize = useStudio((s) => s.setSceneSize);
 
   const shots: ShotRef[] =
     mode === 'pose'
       ? (category === 'all' ? POSES : POSES.filter((p) => p.category === category)).map((p) => ({ kind: 'pose', id: p.id, cameraId }))
-      : SCENES.map((s) => ({ kind: 'scene', id: s.id, cameraId }));
+      : (size === 'all' ? SCENES : SCENES.filter((s) => sceneSize(s) === size)).map((s) => ({ kind: 'scene', id: s.id, cameraId }));
 
   return (
     <section className="flex min-w-0 flex-col gap-4">
@@ -51,6 +53,23 @@ export function Gallery({ skin, cameraId }: { skin: Skin; cameraId: CameraId }) 
             </button>
           ))}
         </div>
+
+        {mode === 'scene' && (
+          <div className="flex flex-wrap gap-2">
+            {(['all', ...SCENE_SIZES] as const).map((n) => (
+              <button
+                key={n}
+                aria-pressed={size === n}
+                onClick={() => setSceneSize(n)}
+                className={`rounded-full border px-3 py-1 text-sm transition-colors duration-200 ${
+                  size === n ? 'border-grass bg-grass/15 text-white' : 'border-edge text-slate-400 hover:text-white'
+                }`}
+              >
+                {n === 'all' ? t('gallery.all') : t('gallery.castCount', { count: n })}
+              </button>
+            ))}
+          </div>
+        )}
 
         {mode === 'pose' && (
           <div className="flex flex-wrap gap-2">

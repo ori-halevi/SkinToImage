@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47];
 const POSE_COUNT = 43;
-const SCENE_COUNT = 12;
+const SCENE_COUNT = 33;
 
 async function readDownload(download: Download): Promise<Uint8Array> {
   return new Uint8Array(await readFile((await download.path())!));
