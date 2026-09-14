@@ -1,4 +1,11 @@
+import type { PartId } from '../../render/rig/layout';
+
 export type SkinModel = 'classic' | 'slim';
+
+/** Which body parts show their second layer (hat, jacket, sleeves, pants legs). */
+export type OverlayParts = Record<PartId, boolean>;
+
+export const ALL_OVERLAY_PARTS: OverlayParts = { head: true, body: true, rightArm: true, leftArm: true, rightLeg: true, leftLeg: true };
 
 export interface Skin {
   id: string;
@@ -10,8 +17,8 @@ export interface Skin {
   /** Original PNG, kept for persistence. */
   blob: Blob;
   bitmap: ImageBitmap;
-  /** Render the second layer (hat, jacket, sleeves, pants). */
-  showOverlay: boolean;
+  /** Second-layer visibility per body part. */
+  overlay: OverlayParts;
   lastUsedAt: number;
 }
 

@@ -108,7 +108,7 @@ function ShotCard({ skin, shot }: { skin: Skin; shot: ShotRef }) {
       <button onClick={() => setOpenShot(shot)} className="block w-full text-start" aria-label={t('gallery.open', { name })}>
         <div className="checker flex aspect-square items-center justify-center p-3">
           {url ? (
-            <img src={url} alt="" className={`max-h-full max-w-full object-contain transition-opacity ${pending ? 'opacity-60' : ''}`} />
+            <img src={url} alt="" className={`fade-in max-h-full max-w-full object-contain transition-opacity duration-200 ${pending ? 'opacity-60' : ''}`} />
           ) : failed ? (
             <span className="text-xs text-red-300">{t('errors.render')}</span>
           ) : (

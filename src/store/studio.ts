@@ -10,8 +10,10 @@ import { forgetSkin, type RenderSettings } from '../render/renderShot';
 export const EXPORT_SIZES = [1024, 2048, 4096] as const;
 export type ExportSize = (typeof EXPORT_SIZES)[number];
 export const MAX_ACTIVE_SKINS = 4;
+export const DEFAULT_CAMERA_ID: CameraId = 'left';
+export const DEFAULT_EXPORT_SIZE: ExportSize = 2048;
 
-type SkinPatch = Partial<Pick<Skin, 'name' | 'model' | 'showOverlay'>>;
+type SkinPatch = Partial<Pick<Skin, 'name' | 'model' | 'overlay'>>;
 
 interface StudioState {
   /** Skins in this session, up to MAX_ACTIVE_SKINS. */
@@ -66,8 +68,8 @@ export const useStudio = create<StudioState>()(
       activeSkinId: null,
       sceneCast: {},
       settings: DEFAULT_SETTINGS,
-      cameraId: 'left',
-      exportSize: 2048,
+      cameraId: DEFAULT_CAMERA_ID,
+      exportSize: DEFAULT_EXPORT_SIZE,
       mode: 'pose',
       category: 'all',
       selection: [],
@@ -107,7 +109,7 @@ export const useStudio = create<StudioState>()(
           return { sceneCast: { ...s.sceneCast, [sceneId]: current } };
         }),
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
-      resetSettings: () => set({ settings: DEFAULT_SETTINGS }),
+      resetSettings: () => set({ settings: DEFAULT_SETTINGS, cameraId: DEFAULT_CAMERA_ID, exportSize: DEFAULT_EXPORT_SIZE }),
       setCamera: (cameraId) => set({ cameraId }),
       setExportSize: (exportSize) => set({ exportSize }),
       setMode: (mode) => set({ mode }),

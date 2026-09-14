@@ -56,7 +56,7 @@
     "removeSkin": "הסרת {{name}}",
     "activeSkin": "שימוש ב-{{name}}",
     "maxSkins": "עד {{max}} סקינים",
-    "overlay": "שכבה שנייה (כובע, ז׳קט)",
+    "overlay": "שכבה שנייה",
     "character": "דמות",
     "effects": "אפקטים",
     "backgroundSection": "רקע",
@@ -78,7 +78,13 @@
     "bgRays": "צבע הקרניים",
     "uploadImage": "בחירת תמונה",
     "frame": "צורת התמונה",
-    "reset": "איפוס הגדרות"
+    "reset": "איפוס כל ההגדרות",
+    "overlayHint": "לוחצים על חלק בגוף כדי להציג או להסתיר את השכבה החיצונית שלו.",
+    "overlayAll": "הכול",
+    "overlayNone": "כלום",
+    "resetField": "החזרת {{name}} לברירת המחדל",
+    "resetSection": "איפוס {{name}}",
+    "modified": "שונה מברירת המחדל"
   },
   "gallery": {
     "all": "הכול",
@@ -212,5 +218,13 @@
     "explosivePanic": "פאניקה",
     "diamondFind": "יהלומים!",
     "campfire": "בילוי"
+  },
+  "overlayParts": {
+    "head": "כובע",
+    "body": "ז׳קט",
+    "rightArm": "שרוול ימין",
+    "leftArm": "שרוול שמאל",
+    "rightLeg": "מכנס ימין",
+    "leftLeg": "מכנס שמאל"
   }
 }

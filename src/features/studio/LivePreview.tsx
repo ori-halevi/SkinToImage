@@ -21,7 +21,7 @@ const AUTO_ROTATE_SPEED = 0.6; // radians per second
 /** Interactive 3D preview with drag-to-rotate. Owns its own (second) WebGL context. */
 export function LivePreview({ skin, lighting, bigHead, heldItem }: Props) {
   const { t } = useTranslation();
-  const { bitmap, model, showOverlay } = skin; // renaming the skin shouldn't rebuild the scene
+  const { bitmap, model, overlay } = skin; // renaming the skin shouldn't rebuild the scene
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function LivePreview({ skin, lighting, bigHead, heldItem }: Props) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const scene = new Scene();
-    const character = new Character(bitmap, { model, lighting, overlay: showOverlay });
+    const character = new Character(bitmap, { model, lighting, overlay });
     character.applyPose(STAND, bigHead);
     character.setHeldItems(heldItem === 'none' ? {} : { right: heldItem });
     scene.add(character.root);
@@ -107,7 +107,7 @@ export function LivePreview({ skin, lighting, bigHead, heldItem }: Props) {
       renderer.forceContextLoss();
       canvas.remove();
     };
-  }, [bitmap, model, showOverlay, lighting, bigHead, heldItem]);
+  }, [bitmap, model, overlay, lighting, bigHead, heldItem]);
 
   return (
     <div

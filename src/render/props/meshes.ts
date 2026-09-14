@@ -80,11 +80,11 @@ const itemGeometries = new Map<ItemId, BufferGeometry>();
 const itemMaterials = new Map<Lighting, Material>();
 
 /** Scale of one item pixel in world units. */
-const ITEM_PIXEL = 0.75;
+const ITEM_PIXEL = 0.85;
 
 /**
- * An item whose origin is its grip point. The sprite lies in the YZ plane, so with the arm
- * hanging down it points forward (+Z) for a character facing +Z, like in-game.
+ * An item whose origin is its grip point, oriented by the sprite's `hold` angle
+ * (tools continue the arm line, bows sit across it).
  */
 export function createItemObject(id: ItemId, lighting: Lighting): Group {
   const sprite = getItemSprite(id);
@@ -109,8 +109,7 @@ export function createItemObject(id: ItemId, lighting: Lighting): Group {
   pivot.rotation.y = -Math.PI / 2;
   const holder = new Group();
   holder.add(pivot);
-  // Tilt so the item's diagonal points straight out of the fist, perpendicular to the arm.
-  holder.rotation.x = Math.PI / 4;
+  holder.rotation.x = (sprite.hold * Math.PI) / 180;
   return holder;
 }
 

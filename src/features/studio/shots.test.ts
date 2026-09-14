@@ -12,7 +12,7 @@ const skin = (id: string): Skin => ({
   size: 64,
   blob: new Blob(),
   bitmap: {} as ImageBitmap,
-  showOverlay: true,
+  overlay: { head: true, body: true, rightArm: true, leftArm: true, rightLeg: true, leftLeg: true },
   lastUsedAt: 0,
 });
 

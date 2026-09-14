@@ -56,7 +56,7 @@
     "removeSkin": "Remove {{name}}",
     "activeSkin": "Use {{name}}",
     "maxSkins": "Up to {{max}} skins",
-    "overlay": "Second layer (hat, jacket)",
+    "overlay": "Second layer",
     "character": "Character",
     "effects": "Effects",
     "backgroundSection": "Background",
@@ -78,7 +78,13 @@
     "bgRays": "Rays color",
     "uploadImage": "Choose image",
     "frame": "Image shape",
-    "reset": "Reset settings"
+    "reset": "Reset all settings",
+    "overlayHint": "Tap a body part to show or hide its outer layer.",
+    "overlayAll": "All",
+    "overlayNone": "None",
+    "resetField": "Reset {{name}} to default",
+    "resetSection": "Reset {{name}}",
+    "modified": "Changed from default"
   },
   "gallery": {
     "all": "All",
@@ -212,5 +218,13 @@
     "explosivePanic": "Explosive panic",
     "diamondFind": "Diamonds!",
     "campfire": "Hangout"
+  },
+  "overlayParts": {
+    "head": "Hat",
+    "body": "Jacket",
+    "rightArm": "Right sleeve",
+    "leftArm": "Left sleeve",
+    "rightLeg": "Right pants leg",
+    "leftLeg": "Left pants leg"
   }
 }

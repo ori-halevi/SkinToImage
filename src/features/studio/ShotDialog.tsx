@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CAMERAS } from '../../data/cameras';
 import { POSES } from '../../data/poses';
 import { getScene, SCENES } from '../../data/scenes';
 import { renderShot } from '../../render/renderShot';
 import { useStudio } from '../../store/studio';
-import { buttonPrimary, buttonSecondary, Chips } from '../../ui/controls';
+import { buttonPrimary, buttonSecondary, Chips, useAnimatedDialog } from '../../ui/controls';
 import { canCopyImage, canShareFiles, copyImage, downloadBlob, shareImage } from '../export/exportImage';
 import type { Skin } from '../skins/types';
 import { shotName, useShotContext } from './Gallery';
@@ -16,7 +16,6 @@ const PREVIEW_SIZE = 1024;
 
 export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
   const { t } = useTranslation();
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const ctx = useShotContext(skin);
   const exportSize = useStudio((s) => s.exportSize);
   const setOpenShot = useStudio((s) => s.setOpenShot);
@@ -32,11 +31,7 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
   const filename = shotFilename(shot, ctx);
   const scene = shot.kind === 'scene' ? getScene(shot.id) : undefined;
 
-  useEffect(() => {
-    const dialog = dialogRef.current!;
-    if (!dialog.open) dialog.showModal();
-    return () => dialog.close();
-  }, []);
+  const { requestClose, dialogProps } = useAnimatedDialog(() => setOpenShot(null));
 
   useEffect(() => setStatus(null), [shot.kind, shot.id, shot.cameraId]);
 
@@ -63,28 +58,26 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
 
   return (
     <dialog
-      ref={dialogRef}
+      {...dialogProps}
       aria-label={name}
-      onClose={() => setOpenShot(null)}
-      onClick={(e) => e.target === dialogRef.current && dialogRef.current.close()}
       onKeyDown={(e) => {
         if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
         const rtl = document.documentElement.dir === 'rtl';
         if (e.key === 'ArrowRight') go(rtl ? -1 : 1);
         if (e.key === 'ArrowLeft') go(rtl ? 1 : -1);
       }}
-      className="m-auto w-[min(94vw,760px)] rounded-xl border border-edge bg-panel p-0 text-slate-100 backdrop:bg-black/70"
+      className="animated-dialog m-auto w-[min(94vw,760px)] rounded-xl border border-edge bg-panel p-0 text-slate-100"
     >
       <div className="flex items-center gap-2 border-b border-edge px-4 py-3">
         <h2 className="me-auto text-lg font-semibold">{name}</h2>
-        <button onClick={() => dialogRef.current?.close()} className="rounded px-2 py-1 text-slate-400 hover:text-white" aria-label={t('dialog.close')}>
+        <button onClick={requestClose} className="rounded px-2 py-1 text-slate-400 hover:text-white" aria-label={t('dialog.close')}>
           ✕
         </button>
       </div>
 
       <div className="relative">
         <div className="checker flex aspect-square max-h-[55vh] w-full items-center justify-center p-6">
-          {url && <img src={url} alt={name} className={`max-h-full max-w-full object-contain ${pending ? 'opacity-60' : ''}`} />}
+          {url && <img src={url} alt={name} className={`fade-in max-h-full max-w-full object-contain transition-opacity duration-200 ${pending ? 'opacity-60' : ''}`} />}
         </div>
         <button onClick={() => go(-1)} aria-label={t('dialog.previous')} className="absolute inset-s-2 top-1/2 -translate-y-1/2 rounded-full bg-ink/80 px-3 py-2 text-xl hover:bg-ink">
           <span className="inline-block rtl:rotate-180">‹</span>

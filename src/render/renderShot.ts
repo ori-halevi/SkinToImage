@@ -72,12 +72,12 @@ const characters = new Map<string, Character>();
 
 /** `occurrence` distinguishes the same skin appearing more than once in a shot. */
 function getCharacter(skin: Skin, lighting: Lighting, occurrence: number): Character {
-  const key = `${skin.id}|${skin.model}|${skin.showOverlay}|${lighting}#${occurrence}`;
+  const key = `${skin.id}|${skin.model}|${JSON.stringify(skin.overlay)}|${lighting}#${occurrence}`;
   let character = characters.get(key);
   if (character) {
     characters.delete(key);
   } else {
-    character = new Character(skin.bitmap, { model: skin.model, lighting, overlay: skin.showOverlay });
+    character = new Character(skin.bitmap, { model: skin.model, lighting, overlay: skin.overlay });
   }
   characters.set(key, character);
   if (characters.size > CHARACTER_CACHE_LIMIT) {
@@ -103,7 +103,7 @@ export function forgetSkin(skinId: string): void {
 /** Stable identity of everything that affects a render's pixels. */
 export function renderKey({ actors, props, camera, settings, size }: ShotSpec): string {
   return JSON.stringify([
-    actors.map((a) => [a.skin.id, a.skin.model, a.skin.showOverlay, a.pose.id, a.position, a.rotationY, a.items]),
+    actors.map((a) => [a.skin.id, a.skin.model, a.skin.overlay, a.pose.id, a.position, a.rotationY, a.items]),
     props,
     camera.id,
     settings,

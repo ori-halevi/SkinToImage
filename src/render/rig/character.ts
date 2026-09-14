@@ -23,8 +23,8 @@ export type Lighting = 'flat' | 'shaded';
 export interface CharacterOptions {
   model: SkinModel;
   lighting: Lighting;
-  /** Render the second (hat/jacket/sleeves/pants) layer. Defaults to true. */
-  overlay?: boolean;
+  /** Second layer (hat/jacket/sleeves/pants) per body part. Parts not listed are shown. */
+  overlay?: Partial<Record<PartId, boolean>>;
 }
 
 export interface HeldItems {
@@ -64,7 +64,7 @@ export class Character {
       joint.position.set(...part.pivot);
 
       const layers = [new Mesh(createSkinBoxGeometry(part.size, part.uv), baseMaterial)];
-      if (options.overlay !== false) {
+      if (options.overlay?.[part.id] !== false) {
         const overlay = new Mesh(createSkinBoxGeometry(part.size, part.overlayUv, part.overlayInflate), overlayMaterial);
         overlay.renderOrder = 1;
         layers.push(overlay);
@@ -78,8 +78,12 @@ export class Character {
 
       if (part.id === 'rightArm' || part.id === 'leftArm') {
         // Grip point: inside the fist, near the bottom of the arm.
-        const hand = this.hands[part.id === 'rightArm' ? 'right' : 'left'];
+        const side = part.id === 'rightArm' ? 'right' : 'left';
+        const hand = this.hands[side];
         hand.position.set(part.offset[0], -9, 0);
+        // Turn the item's flat side partly toward the viewer; held perfectly edge-on (as in-game)
+        // a sword reads as a thin stick in a front or 3/4 shot.
+        hand.rotation.y = MathUtils.degToRad(side === 'right' ? -40 : 40);
         joint.add(hand);
       }
 

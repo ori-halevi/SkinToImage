@@ -34,7 +34,7 @@ test('sample skin → gallery → ZIP download', async ({ page }) => {
   await page.getByRole('checkbox', { name: 'Select Dab' }).check();
   await expect(page.getByText('2 selected')).toBeVisible();
 
-  await page.locator('summary', { hasText: 'Export' }).click();
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
   await page.getByRole('button', { name: '1024px', exact: true }).click();
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download ZIP' }).click()]);
   expect(download.suggestedFilename()).toBe('explorer_images.zip');
@@ -61,10 +61,10 @@ test('single image download from the dialog', async ({ page }) => {
 
 test('16:9 background frame produces a 16:9 image', async ({ page }) => {
   await loadSample(page);
-  await page.locator('summary', { hasText: 'Background' }).click();
+  await page.getByRole('button', { name: 'Background', exact: true }).click();
   await page.getByRole('button', { name: 'Sunburst' }).click();
   await page.getByRole('button', { name: '16:9' }).click();
-  await page.locator('summary', { hasText: 'Export' }).click();
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
   await page.getByRole('button', { name: '1024px', exact: true }).click();
 
   await page.getByRole('button', { name: 'Open Wave' }).click();
@@ -107,6 +107,35 @@ test('loads a skin by username (mocked services)', async ({ page }) => {
   await page.getByRole('button', { name: 'Load', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Use TestPlayer' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Slim', exact: true })).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('reset buttons appear only for changed settings and restore defaults', async ({ page }) => {
+  await loadSample(page);
+  const itemSelect = page.getByLabel('Item in hand', { exact: true });
+  const resetItem = page.getByRole('button', { name: 'Reset Item in hand to default' });
+  await expect(resetItem).toHaveCount(0);
+
+  await itemSelect.selectOption('sword');
+  await expect(resetItem).toBeVisible();
+  await resetItem.click();
+  await expect(itemSelect).toHaveValue('none');
+  await expect(resetItem).toHaveCount(0);
+
+  await itemSelect.selectOption('bow');
+  await page.getByRole('button', { name: /^Reset Character$/ }).click();
+  await expect(itemSelect).toHaveValue('none');
+});
+
+test('second layer can be toggled per body part', async ({ page }) => {
+  await loadSample(page);
+  const hat = page.getByRole('button', { name: 'Hat', exact: true });
+  await expect(hat).toHaveAttribute('aria-pressed', 'true');
+  await hat.click();
+  await expect(hat).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByRole('button', { name: 'Jacket', exact: true })).toHaveAttribute('aria-pressed', 'true');
+
+  await page.getByRole('button', { name: 'Reset Second layer to default' }).click();
+  await expect(hat).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('rejects invalid files with a clear error', async ({ page }) => {

@@ -1,13 +1,17 @@
 import { createStore, del, entries, set } from 'idb-keyval';
 import { loadSkinFromBlob } from './loadSkin';
-import type { Skin, SkinModel } from './types';
+import type { OverlayParts, Skin, SkinModel } from './types';
 
 export const MAX_RECENT_SKINS = 10;
+
+const NO_OVERLAY: OverlayParts = { head: false, body: false, rightArm: false, leftArm: false, rightLeg: false, leftLeg: false };
 
 interface StoredSkin {
   id: string;
   name: string;
   model: SkinModel;
+  overlay?: OverlayParts;
+  /** Saved by older versions, before per-part layers. */
   showOverlay?: boolean;
   blob: Blob;
   lastUsedAt: number;
@@ -23,7 +27,11 @@ export async function listRecentSkins(): Promise<Skin[]> {
     const skins = await Promise.all(
       stored.slice(0, MAX_RECENT_SKINS).map(async (s) => {
         try {
-          const skin = await loadSkinFromBlob(s.blob, s.name, { id: s.id, model: s.model, showOverlay: s.showOverlay });
+          const skin = await loadSkinFromBlob(s.blob, s.name, {
+            id: s.id,
+            model: s.model,
+            overlay: s.overlay ?? (s.showOverlay === false ? NO_OVERLAY : undefined),
+          });
           return { ...skin, lastUsedAt: s.lastUsedAt };
         } catch {
           await del(s.id, store);
@@ -43,7 +51,7 @@ export async function saveRecentSkin(skin: Skin): Promise<void> {
       id: skin.id,
       name: skin.name,
       model: skin.model,
-      showOverlay: skin.showOverlay,
+      overlay: skin.overlay,
       blob: skin.blob,
       lastUsedAt: skin.lastUsedAt,
     };

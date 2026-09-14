@@ -1,6 +1,6 @@
 import { detectModel } from './detectModel';
 import { upgradeLegacySkin } from './legacySkin';
-import type { Skin, SkinModel } from './types';
+import { ALL_OVERLAY_PARTS, type OverlayParts, type Skin, type SkinModel } from './types';
 import { validateDimensions, validateFileType, type SkinValidationError } from './validation';
 
 export class SkinLoadError extends Error {
@@ -12,7 +12,7 @@ export class SkinLoadError extends Error {
 export interface SkinOverrides {
   id?: string;
   model?: SkinModel;
-  showOverlay?: boolean;
+  overlay?: Partial<OverlayParts>;
   /** Convert legacy 64×32 skins instead of rejecting them (used for skins fetched by username). */
   upgradeLegacy?: boolean;
 }
@@ -52,7 +52,7 @@ export async function loadSkinFromBlob(blob: Blob, name: string, overrides: Skin
     size: bitmap.width,
     blob,
     bitmap,
-    showOverlay: overrides.showOverlay ?? true,
+    overlay: { ...ALL_OVERLAY_PARTS, ...overrides.overlay },
     lastUsedAt: Date.now(),
   };
 }
