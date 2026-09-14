@@ -323,6 +323,11 @@
       "shorts": "Shorts / TikTok"
     },
     "pasteHint": "Tip: copy an image anywhere and press Ctrl+V here to use it as the background.",
-    "skinsMissing": "The skins for this image aren't available anymore. Load them again in the generator."
+    "skinsMissing": "The skins for this image aren't available anymore. Load them again in the generator.",
+    "selectCharacterHint": "Click a character on the canvas to swap who plays whom or black characters out.",
+    "swapNeedsSkins": "Load more skins in the generator to swap characters.",
+    "makeEditableHint": "This image was added before characters could be swapped or blacked out.",
+    "makeEditable": "Make characters editable",
+    "swapNamed": "Swap characters in {{name}}"
   }
 }

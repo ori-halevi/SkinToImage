@@ -4,19 +4,23 @@ import { buttonSecondary, ColorInput, Field, Segmented, Slider, Toggle } from '.
 import { FONT_IDS, FONTS } from '../fonts';
 import { useComposer } from '../store';
 import type { ImageLayer, Layer, TextLayer } from '../types';
-import { MissingSkinsError, rerenderLayer } from '../rerender';
-import { swapCast } from '../../studio/shots';
+import { distinctSkins, inferSource, MissingSkinsError, rerenderLayer, swapLayerCast, toggleLayerSilhouette } from '../rerender';
 import { useStudio } from '../../../store/studio';
 import { getRecentSkin } from '../../skins/recentSkins';
 
 export function PropertiesPanel() {
   const { t } = useTranslation();
   const layer = useComposer((s) => s.project?.layers.find((l) => l.id === s.selectedId) ?? null);
+  const hasCharacters = useComposer((s) => !!s.project?.layers.some((l) => l.type === 'image' && l.source));
 
   return (
     <section className="flex flex-col gap-4 rounded-xl border border-edge bg-panel p-4">
       <h2 className="font-semibold">{t('composer.properties')}</h2>
-      {layer ? <LayerProperties layer={layer} /> : <p className="text-sm text-slate-400">{t('composer.nothingSelected')}</p>}
+      {layer ? (
+        <LayerProperties layer={layer} />
+      ) : (
+        <p className="text-sm text-slate-400">{t(hasCharacters ? 'composer.selectCharacterHint' : 'composer.nothingSelected')}</p>
+      )}
     </section>
   );
 }
@@ -28,7 +32,7 @@ function LayerProperties({ layer }: { layer: Layer }) {
   return (
     <>
       {layer.type === 'text' && <TextProperties layer={layer} />}
-      {layer.type === 'image' && layer.source && <CharacterProperties key={layer.id} layer={layer} />}
+      {layer.type === 'image' && (layer.source ? <CharacterProperties key={layer.id} layer={layer} /> : <MakeEditable key={layer.id} layer={layer} />)}
 
       <Slider
         label={t('composer.opacity')}
@@ -126,38 +130,39 @@ function TextProperties({ layer }: { layer: TextLayer }) {
   );
 }
 
-/** Swap characters / black out individual characters of an image added from the gallery. */
-function CharacterProperties({ layer }: { layer: ImageLayer }) {
+/** Runs a re-render with busy and error state. */
+function useRerender() {
   const { t } = useTranslation();
-  const cast = layer.source!.cast;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const names = useSkinNames(cast.map((c) => c.skinId));
-  const distinct = new Set(cast.map((c) => c.skinId)).size;
-
-  const apply = async (next: typeof cast) => {
+  const run = async (task: () => Promise<void>) => {
     setBusy(true);
     setError(null);
     try {
-      await rerenderLayer(layer, next);
+      await task();
     } catch (e) {
       setError(e instanceof MissingSkinsError ? t('composer.skinsMissing') : t('errors.render'));
     } finally {
       setBusy(false);
     }
   };
+  return { busy, error, run };
+}
+
+/** Swap characters / black out individual characters of an image added from the gallery. */
+function CharacterProperties({ layer }: { layer: ImageLayer }) {
+  const { t } = useTranslation();
+  const cast = layer.source!.cast;
+  const { busy, error, run } = useRerender();
+  const names = useSkinNames(cast.map((c) => c.skinId));
 
   return (
     <div className="flex flex-col gap-2 border-b border-edge pb-4">
       <div className="flex items-center gap-2 text-sm">
         <span className="font-medium">{t('dialog.cast')}</span>
         <span className="ms-auto" />
-        {distinct > 1 && (
-          <button
-            disabled={busy}
-            onClick={() => void apply(swapCast(cast, (c) => c.skinId, (_, next) => ({ skinId: next.skinId, silhouette: next.silhouette })))}
-            className={`${buttonSecondary} px-2 py-0.5 text-xs`}
-          >
+        {distinctSkins(layer) > 1 && (
+          <button disabled={busy} onClick={() => void run(() => swapLayerCast(layer))} className={`${buttonSecondary} px-2 py-0.5 text-xs`}>
             <span aria-hidden>⇄</span> {t('dialog.swap')}
           </button>
         )}
@@ -173,7 +178,7 @@ function CharacterProperties({ layer }: { layer: ImageLayer }) {
               aria-pressed={member.silhouette}
               aria-label={t('dialog.silhouetteFor', { name: names[member.skinId] ?? '' })}
               title={t('studio.silhouette')}
-              onClick={() => void apply(cast.map((c, j) => (j === i ? { ...c, silhouette: !c.silhouette } : c)))}
+              onClick={() => void run(() => toggleLayerSilhouette(layer, i))}
               className={`inline-flex size-7 items-center justify-center rounded-md border transition-colors ${
                 member.silhouette ? 'border-slate-300 bg-black text-white' : 'border-edge text-slate-500 hover:text-white'
               }`}
@@ -183,7 +188,25 @@ function CharacterProperties({ layer }: { layer: ImageLayer }) {
           </li>
         ))}
       </ul>
+      {distinctSkins(layer) < 2 && cast.length > 1 && <p className="text-xs text-slate-500">{t('composer.swapNeedsSkins')}</p>}
       {busy && <p className="text-xs text-slate-400">{t('dialog.rendering')}</p>}
+      {error && <p role="alert" className="text-xs text-red-300">{error}</p>}
+    </div>
+  );
+}
+
+/** Older images (added before images remembered their origin): offer to rebuild them as editable. */
+function MakeEditable({ layer }: { layer: ImageLayer }) {
+  const { t } = useTranslation();
+  const { busy, error, run } = useRerender();
+  const source = inferSource(layer);
+  if (!source) return null;
+  return (
+    <div className="flex flex-col gap-2 border-b border-edge pb-4 text-sm">
+      <p className="text-slate-400">{t('composer.makeEditableHint')}</p>
+      <button disabled={busy} onClick={() => void run(() => rerenderLayer(layer, source))} className={`${buttonSecondary} py-1 text-sm`}>
+        {busy ? t('dialog.rendering') : t('composer.makeEditable')}
+      </button>
       {error && <p role="alert" className="text-xs text-red-300">{error}</p>}
     </div>
   );

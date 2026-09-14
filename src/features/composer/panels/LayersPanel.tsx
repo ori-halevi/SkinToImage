@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { distinctSkins, swapLayerCast } from '../rerender';
 import { useComposer } from '../store';
 import type { Layer } from '../types';
 
@@ -7,6 +9,7 @@ export function LayersPanel() {
   const layers = useComposer((s) => s.project?.layers ?? []);
   const selectedId = useComposer((s) => s.selectedId);
   const { select, reorderLayer, removeLayer } = useComposer.getState();
+  const [swapping, setSwapping] = useState<string | null>(null);
 
   const label = (layer: Layer) => (layer.type === 'text' ? `“${layer.text.split('\n')[0] || '…'}”` : layer.label);
 
@@ -29,6 +32,26 @@ export function LayersPanel() {
               </span>
               <span className="truncate">{label(layer)}</span>
             </button>
+            {layer.type === 'image' && layer.source && distinctSkins(layer) > 1 && (
+              <button
+                onClick={async () => {
+                  setSwapping(layer.id);
+                  try {
+                    await swapLayerCast(layer);
+                  } catch {
+                    select(layer.id); // the properties panel explains what's missing
+                  } finally {
+                    setSwapping(null);
+                  }
+                }}
+                disabled={swapping === layer.id}
+                aria-label={t('composer.swapNamed', { name: label(layer) })}
+                title={t('dialog.swap')}
+                className="rounded px-1.5 text-slate-300 hover:text-white disabled:animate-pulse"
+              >
+                ⇄
+              </button>
+            )}
             <button
               onClick={() => reorderLayer(layer.id, 'up')}
               disabled={i === 0}
