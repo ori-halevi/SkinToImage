@@ -1,0 +1,9 @@
+{
+  "id": "pointSide",
+  "category": "action",
+  "bones": {
+    "head": [0, -35, 0],
+    "rightArm": [-10, 0, -88],
+    "leftArm": [0, 0, 5]
+  }
+}

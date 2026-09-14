@@ -1,0 +1,10 @@
+{
+  "id": "dab",
+  "category": "funny",
+  "bones": {
+    "head": [25, -20, 10],
+    "body": [0, 0, 5],
+    "rightArm": [-20, 0, -125],
+    "leftArm": [-120, 0, -50]
+  }
+}

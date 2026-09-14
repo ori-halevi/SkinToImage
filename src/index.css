@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #0f1419;
+  --color-panel: #1a2129;
+  --color-edge: #2c3641;
+  --color-grass: #5fb04a;
+  --color-grass-dark: #3f8a30;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: #e6edf3;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Checkerboard behind renders so transparency is visible. */
+.checker {
+  background-color: #2a323b;
+  background-image:
+    linear-gradient(45deg, #232a32 25%, transparent 25%),
+    linear-gradient(-45deg, #232a32 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #232a32 75%),
+    linear-gradient(-45deg, transparent 75%, #232a32 75%);
+  background-size: 24px 24px;
+  background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+}

@@ -1,0 +1,12 @@
+{
+  "id": "victory",
+  "category": "emotion",
+  "bones": {
+    "head": [-12, 0, 0],
+    "body": [-5, 0, 0],
+    "rightArm": [-10, 0, -170],
+    "leftArm": [-10, 0, 170],
+    "rightLeg": [0, 0, -5],
+    "leftLeg": [0, 0, 5]
+  }
+}

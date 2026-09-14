@@ -1,0 +1,9 @@
+{
+  "id": "thinking",
+  "category": "emotion",
+  "bones": {
+    "head": [-8, 15, -8],
+    "rightArm": [-116, 0, 42],
+    "leftArm": [-40, 0, -30]
+  }
+}

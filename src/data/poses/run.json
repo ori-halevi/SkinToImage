@@ -1,0 +1,12 @@
+{
+  "id": "run",
+  "category": "action",
+  "bones": {
+    "head": [-8, 0, 0],
+    "body": [12, 0, 0],
+    "rightArm": [50, 0, 0],
+    "leftArm": [-60, 0, 0],
+    "rightLeg": [-45, 0, 0],
+    "leftLeg": [40, 0, 0]
+  }
+}

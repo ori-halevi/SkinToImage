@@ -1,0 +1,10 @@
+{
+  "id": "facepalm",
+  "category": "emotion",
+  "bones": {
+    "head": [15, 0, 0],
+    "body": [8, 0, 0],
+    "rightArm": [-141, 0, 33],
+    "leftArm": [0, 0, 4]
+  }
+}

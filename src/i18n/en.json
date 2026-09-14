@@ -1,0 +1,101 @@
+{
+  "app": {
+    "privacy": "Your skin never leaves your device",
+    "disclaimer": "Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.",
+    "language": "Language"
+  },
+  "upload": {
+    "title": "Turn your skin into thumbnail-ready renders",
+    "subtitle": "Upload a skin and download transparent PNGs. Everything runs in your browser.",
+    "drop": "Drop your skin PNG here",
+    "choose": "Choose file",
+    "sample": "Try a sample skin",
+    "paste": "…or paste an image with Ctrl+V",
+    "recent": "Recent skins",
+    "remove": "Remove {{name}}"
+  },
+  "errors": {
+    "not-png": "Only PNG skin files are supported.",
+    "legacy-64x32": "Old 64×32 skins aren't supported. Try re-saving your skin in a modern skin editor.",
+    "bad-dimensions": "Skin must be 64×64 (or a multiple, like 128×128).",
+    "too-large": "Skin is too large. The maximum supported size is {{max}}×{{max}}.",
+    "unknown": "Something went wrong while reading this file.",
+    "webgl": "Your browser doesn't support 3D rendering. Try the latest Chrome, Firefox or Safari.",
+    "render": "Rendering failed.",
+    "action": "That didn't work. Try downloading instead."
+  },
+  "studio": {
+    "skinName": "Skin name",
+    "change": "Change skin",
+    "armModel": "Arm model",
+    "detected": "Detected: {{model}}",
+    "classic": "Classic",
+    "slim": "Slim",
+    "camera": "Camera",
+    "lighting": "Lighting",
+    "shaded": "Shaded",
+    "flat": "Flat",
+    "headSize": "Head size: {{value}}×",
+    "outline": "Outline",
+    "outlineEnable": "Enable outline",
+    "outlineWidth": "Outline width",
+    "outlineColor": "Outline color",
+    "exportSize": "Export size",
+    "settings": "Settings",
+    "preview": "3D preview. Drag to rotate."
+  },
+  "gallery": {
+    "all": "All",
+    "select": "Select {{name}}",
+    "selected_one": "{{count}} selected",
+    "selected_other": "{{count}} selected",
+    "selectAll": "Select all",
+    "clear": "Clear",
+    "downloadZip": "Download ZIP",
+    "zipProgress": "Rendering {{done}}/{{total}}…",
+    "cancel": "Cancel",
+    "open": "Open {{name}}"
+  },
+  "categories": {
+    "emotion": "Emotions",
+    "action": "Action",
+    "casual": "Casual",
+    "funny": "Funny"
+  },
+  "dialog": {
+    "download": "Download PNG",
+    "copy": "Copy",
+    "share": "Share",
+    "close": "Close",
+    "rendering": "Rendering…",
+    "downloaded": "Downloaded!",
+    "copied": "Copied to clipboard!",
+    "shared": "Shared!",
+    "select": "Add to ZIP",
+    "previous": "Previous pose",
+    "next": "Next pose"
+  },
+  "poses": {
+    "wave": "Wave",
+    "point": "Point",
+    "shocked": "Shocked",
+    "facepalm": "Facepalm",
+    "victory": "Victory",
+    "thinking": "Thinking",
+    "pointSide": "Point aside",
+    "run": "Run",
+    "jump": "Jump",
+    "dab": "Dab",
+    "stand": "Stand",
+    "salute": "Salute",
+    "crouch": "Crouch",
+    "sit": "Sit",
+    "fall": "Fall",
+    "tpose": "T-Pose"
+  },
+  "cameras": {
+    "left": "Left",
+    "front": "Front",
+    "right": "Right"
+  }
+}

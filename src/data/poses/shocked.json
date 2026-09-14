@@ -1,0 +1,12 @@
+{
+  "id": "shocked",
+  "category": "emotion",
+  "bones": {
+    "head": [-12, 0, 0],
+    "body": [-8, 0, 0],
+    "rightArm": [-15, 0, -155],
+    "leftArm": [-15, 0, 155],
+    "rightLeg": [0, 0, -6],
+    "leftLeg": [0, 0, 6]
+  }
+}

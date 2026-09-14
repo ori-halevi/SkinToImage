@@ -1,0 +1,8 @@
+{
+  "id": "tpose",
+  "category": "funny",
+  "bones": {
+    "rightArm": [0, 0, -90],
+    "leftArm": [0, 0, 90]
+  }
+}

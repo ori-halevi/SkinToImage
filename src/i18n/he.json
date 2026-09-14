@@ -1,0 +1,101 @@
+{
+  "app": {
+    "privacy": "הסקין שלך לא עוזב את המכשיר",
+    "disclaimer": "זה לא מוצר רשמי של Minecraft. לא מאושר על ידי Mojang או Microsoft ולא קשור אליהן.",
+    "language": "שפה"
+  },
+  "upload": {
+    "title": "הופכים את הסקין שלך לתמונות מוכנות ל-Thumbnail",
+    "subtitle": "מעלים סקין ומורידים תמונות PNG שקופות. הכול קורה בדפדפן.",
+    "drop": "גררו לכאן את קובץ ה-PNG של הסקין",
+    "choose": "בחירת קובץ",
+    "sample": "לנסות סקין לדוגמה",
+    "paste": "…או להדביק תמונה עם Ctrl+V",
+    "recent": "סקינים אחרונים",
+    "remove": "הסרת {{name}}"
+  },
+  "errors": {
+    "not-png": "אפשר להעלות רק קבצי PNG.",
+    "legacy-64x32": "סקינים ישנים בגודל 64×32 לא נתמכים. נסו לשמור את הסקין מחדש בעורך סקינים עדכני.",
+    "bad-dimensions": "הסקין צריך להיות בגודל 64×64 (או כפולה שלו, כמו 128×128).",
+    "too-large": "הסקין גדול מדי. הגודל המקסימלי הוא {{max}}×{{max}}.",
+    "unknown": "משהו השתבש בקריאת הקובץ.",
+    "webgl": "הדפדפן שלך לא תומך בתלת-ממד. נסו גרסה עדכנית של Chrome, Firefox או Safari.",
+    "render": "יצירת התמונה נכשלה.",
+    "action": "זה לא עבד. נסו להוריד את התמונה במקום."
+  },
+  "studio": {
+    "skinName": "שם הסקין",
+    "change": "החלפת סקין",
+    "armModel": "סוג ידיים",
+    "detected": "זוהה: {{model}}",
+    "classic": "רגיל",
+    "slim": "צר",
+    "camera": "זווית",
+    "lighting": "תאורה",
+    "shaded": "מוצללת",
+    "flat": "שטוחה",
+    "headSize": "גודל ראש: {{value}}×",
+    "outline": "מסגרת",
+    "outlineEnable": "הפעלת מסגרת",
+    "outlineWidth": "עובי המסגרת",
+    "outlineColor": "צבע המסגרת",
+    "exportSize": "גודל להורדה",
+    "settings": "הגדרות",
+    "preview": "תצוגה תלת-ממדית. גררו כדי לסובב."
+  },
+  "gallery": {
+    "all": "הכול",
+    "select": "בחירת {{name}}",
+    "selected_one": "נבחרה תמונה אחת",
+    "selected_other": "נבחרו {{count}} תמונות",
+    "selectAll": "לבחור הכול",
+    "clear": "ניקוי",
+    "downloadZip": "הורדת ZIP",
+    "zipProgress": "יוצר {{done}}/{{total}}…",
+    "cancel": "ביטול",
+    "open": "פתיחת {{name}}"
+  },
+  "categories": {
+    "emotion": "רגשות",
+    "action": "פעולה",
+    "casual": "יומיום",
+    "funny": "מצחיק"
+  },
+  "dialog": {
+    "download": "הורדת PNG",
+    "copy": "העתקה",
+    "share": "שיתוף",
+    "close": "סגירה",
+    "rendering": "יוצר תמונה…",
+    "downloaded": "הורד!",
+    "copied": "הועתק!",
+    "shared": "שותף!",
+    "select": "להוסיף ל-ZIP",
+    "previous": "הפוזה הקודמת",
+    "next": "הפוזה הבאה"
+  },
+  "poses": {
+    "wave": "נפנוף",
+    "point": "הצבעה",
+    "shocked": "בהלם",
+    "facepalm": "פייספאלם",
+    "victory": "ניצחון",
+    "thinking": "חושב",
+    "pointSide": "הצבעה הצידה",
+    "run": "ריצה",
+    "jump": "קפיצה",
+    "dab": "דאב",
+    "stand": "עמידה",
+    "salute": "הצדעה",
+    "crouch": "כריעה",
+    "sit": "ישיבה",
+    "fall": "נפילה",
+    "tpose": "T-Pose"
+  },
+  "cameras": {
+    "left": "שמאל",
+    "front": "חזית",
+    "right": "ימין"
+  }
+}

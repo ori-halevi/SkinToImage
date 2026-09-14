@@ -1,0 +1,12 @@
+{
+  "id": "crouch",
+  "category": "casual",
+  "bones": {
+    "head": [-20, 0, 0],
+    "body": [28, 0, 0],
+    "rightArm": [-25, 0, -4],
+    "leftArm": [-25, 0, 4],
+    "rightLeg": [-20, 0, 0],
+    "leftLeg": [-20, 0, 0]
+  }
+}

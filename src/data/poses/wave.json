@@ -1,0 +1,12 @@
+{
+  "id": "wave",
+  "category": "casual",
+  "bones": {
+    "head": [-4, -12, 4],
+    "body": [0, -6, 0],
+    "rightArm": [-10, 0, -140],
+    "leftArm": [4, 0, 6],
+    "rightLeg": [-4, 0, -3],
+    "leftLeg": [4, 0, 3]
+  }
+}

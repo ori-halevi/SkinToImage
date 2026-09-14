@@ -1,0 +1,9 @@
+{
+  "id": "salute",
+  "category": "casual",
+  "bones": {
+    "head": [-4, 0, 0],
+    "rightArm": [-153, 0, 20],
+    "leftArm": [0, 0, 3]
+  }
+}

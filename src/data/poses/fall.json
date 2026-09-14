@@ -1,0 +1,12 @@
+{
+  "id": "fall",
+  "category": "action",
+  "bones": {
+    "head": [20, 0, 0],
+    "rightArm": [-20, 0, -120],
+    "leftArm": [-60, 0, 100],
+    "rightLeg": [-40, 0, 0],
+    "leftLeg": [-10, 0, 0]
+  },
+  "root": { "rotation": [-30, 0, 0] }
+}
