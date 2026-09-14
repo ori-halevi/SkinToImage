@@ -9,6 +9,7 @@ import { buttonPrimary, buttonSecondary, Chips, useAnimatedDialog } from '../../
 import { canCopyImage, canShareFiles, copyImage, downloadBlob, shareImage } from '../export/exportImage';
 import type { Skin } from '../skins/types';
 import { shotName, useShotContext } from './Gallery';
+import { addShotsToEditor } from './editorBridge';
 import { buildShot, castForScene, shotFilename, shotKey, type ShotRef } from './shots';
 import { useRenderUrl } from './useRenderUrl';
 
@@ -160,6 +161,18 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
               {t('dialog.share')}
             </button>
           )}
+          <button
+            disabled={busy}
+            className={buttonSecondary}
+            onClick={() =>
+              run(async () => {
+                await addShotsToEditor([shot], ctx, t);
+                requestClose();
+              }, '')
+            }
+          >
+            {t('composer.addToEditor')}
+          </button>
           <label className="ms-auto flex items-center gap-2 text-sm">
             <input type="checkbox" checked={selected} onChange={() => toggleSelected(shot)} className="size-4 accent-grass" />
             {t('dialog.select')}

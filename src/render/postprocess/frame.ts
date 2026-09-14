@@ -85,9 +85,20 @@ export function hasBackgroundImage(id: string): boolean {
   return backgroundImages.has(id);
 }
 
-type Ctx = OffscreenCanvasRenderingContext2D;
+type Ctx = OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
 
-function paintBackground(ctx: Ctx, bg: Background, w: number, h: number, focus: { x: number; y: number }) {
+/**
+ * Paints a background. `resolveImage` looks up image backgrounds (defaults to the images registered
+ * for renders; the editor passes its own asset lookup).
+ */
+export function paintBackground(
+  ctx: Ctx,
+  bg: Background,
+  w: number,
+  h: number,
+  focus: { x: number; y: number },
+  resolveImage: (id: string) => CanvasImageSource | undefined = (id) => backgroundImages.get(id),
+) {
   switch (bg.type) {
     case 'transparent':
       return;
@@ -127,9 +138,10 @@ function paintBackground(ctx: Ctx, bg: Background, w: number, h: number, focus: 
       return;
     }
     case 'image': {
-      const image = backgroundImages.get(bg.imageId);
+      const image = resolveImage(bg.imageId);
       if (!image) return;
-      const r = coverRect(image.width, image.height, w, h);
+      const { width: iw, height: ih } = image as { width: number; height: number };
+      const r = coverRect(iw, ih, w, h);
       ctx.drawImage(image, r.x, r.y, r.width, r.height);
       return;
     }

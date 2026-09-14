@@ -148,6 +148,35 @@ test('second layer can be toggled per body part', async ({ page }) => {
   await expect(hat).toHaveAttribute('aria-pressed', 'true');
 });
 
+test('editor: add characters from the gallery, add text, undo, export', async ({ page }) => {
+  await loadSample(page);
+  await page.getByRole('checkbox', { name: 'Select Wave' }).check();
+  await page.getByRole('checkbox', { name: 'Select Shocked' }).check();
+  await page.getByRole('button', { name: 'Add to editor' }).click();
+
+  await expect(page).toHaveURL(/#editor$/);
+  const layers = page.locator('section', { has: page.getByRole('heading', { name: 'Layers' }) }).locator('li');
+  await expect(layers).toHaveCount(2);
+
+  await page.getByRole('button', { name: 'Add text' }).click();
+  await expect(layers).toHaveCount(3);
+  await page.getByLabel('Text', { exact: true }).fill('EPIC WIN!');
+  await expect(layers.first()).toContainText('EPIC WIN!');
+
+  await page.getByRole('button', { name: 'Undo' }).click(); // the text edit
+  await page.getByRole('button', { name: 'Undo' }).click(); // adding the text layer
+  await expect(layers).toHaveCount(2);
+  await page.getByRole('button', { name: 'Redo' }).click();
+  await expect(layers).toHaveCount(3);
+
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download PNG' }).click()]);
+  expect(pngSize(await readDownload(download))).toEqual([1280, 720]);
+
+  // The project is saved and listed.
+  await page.getByRole('button', { name: 'Projects' }).click();
+  await expect(page.getByRole('dialog', { name: 'Projects' }).getByRole('button', { name: /^Open My thumbnail/ })).toBeVisible();
+});
+
 test('rejects invalid files with a clear error', async ({ page }) => {
   await page.getByTestId('skin-input').setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: Buffer.from([1, 2, 3]) });
   await expect(page.getByRole('alert')).toHaveText('Only PNG skin files are supported.');

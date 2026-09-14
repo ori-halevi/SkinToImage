@@ -12,6 +12,7 @@ import { buildZip, type ZipEntry } from '../export/zip';
 import type { Skin } from '../skins/types';
 import { buildShot, parseShotKey, shotFilename, shotKey, type ShotContext, type ShotRef } from './shots';
 import { useRenderUrl } from './useRenderUrl';
+import { addShotsToEditor } from './editorBridge';
 
 const THUMB_SIZE = 512;
 
@@ -210,6 +211,21 @@ function SelectionBar({ skin, visible }: { skin: Skin; visible: ShotRef[] }) {
           </button>
           <button onClick={() => downloadZip(visible)} className={`${buttonSecondary} py-1`}>
             {t('gallery.downloadAll')}
+          </button>
+          <button
+            onClick={async () => {
+              const shots = selection.map(parseShotKey);
+              setProgress({ done: 0, total: shots.length });
+              try {
+                await addShotsToEditor(shots, ctx, t, (done) => setProgress({ done, total: shots.length }));
+              } finally {
+                setProgress(null);
+              }
+            }}
+            disabled={selection.length === 0}
+            className={`${buttonSecondary} py-1`}
+          >
+            {t('composer.addToEditor')}
           </button>
           <button onClick={() => downloadZip(selection.map(parseShotKey))} disabled={selection.length === 0} className={`${buttonPrimary} py-1`}>
             {t('gallery.downloadZip')}
