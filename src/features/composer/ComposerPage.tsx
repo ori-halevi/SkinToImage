@@ -10,8 +10,12 @@ import { AddPanel } from './panels/AddPanel';
 import { LayersPanel } from './panels/LayersPanel';
 import { PropertiesPanel } from './panels/PropertiesPanel';
 import { ProjectsDialog } from './panels/ProjectsDialog';
+import { AddSkinDialog } from '../skins/UploadPanel';
+import { useStudio } from '../../store/studio';
 import { useComposer } from './store';
-import { saveAsset } from './storage';
+import { assetSize, saveAsset } from './storage';
+import { createImageLayer } from './docOps';
+import { create } from 'zustand';
 import { imageFromPaste, isEditingText } from '../export/clipboard';
 import { CANVAS_PRESET_IDS, CANVAS_PRESETS, presetFor, type CanvasPresetId } from './types';
 
@@ -37,6 +41,7 @@ function Editor() {
   const { undo, redo, rename, resizeCanvas } = useComposer.getState();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const [projectsOpen, setProjectsOpen] = useState(false);
+  const addSkinOpen = useStudio((s) => s.addSkinOpen);
   const [exporting, setExporting] = useState<ExportFormat | null>(null);
   const [nameDraft, setNameDraft] = useState(project.name);
 
@@ -118,9 +123,23 @@ function Editor() {
       </div>
 
       {projectsOpen && <ProjectsDialog onClose={() => setProjectsOpen(false)} />}
+      {addSkinOpen && <AddSkinDialog />}
+      <PasteToast />
     </div>
   );
 }
+
+/** The last Ctrl+V, so it can be turned from a background into an image layer. */
+interface PastedImage {
+  assetId: string;
+  width: number;
+  height: number;
+  label: string;
+}
+const usePasteState = create<{ pasted: PastedImage | null; set: (pasted: PastedImage | null) => void }>()((set) => ({
+  pasted: null,
+  set: (pasted) => set({ pasted }),
+}));
 
 /** Ctrl+V with an image in the clipboard sets it as the background: no need to save it to disk first. */
 function usePasteBackground() {
@@ -130,11 +149,46 @@ function usePasteBackground() {
       const image = imageFromPaste(e);
       if (!image) return;
       e.preventDefault();
-      useComposer.getState().setBackground({ type: 'image', imageId: await saveAsset(image) });
+      const [assetId, size] = await Promise.all([saveAsset(image), assetSize(image)]);
+      useComposer.getState().setBackground({ type: 'image', imageId: assetId });
+      usePasteState.getState().set({ assetId, label: image.name.replace(/\.[^.]+$/, '') || 'image', ...size });
     };
     window.addEventListener('paste', onPaste);
     return () => window.removeEventListener('paste', onPaste);
   }, []);
+}
+
+/** "Pasted as background — add as an image instead?" */
+function PasteToast() {
+  const { t } = useTranslation();
+  const pasted = usePasteState((s) => s.pasted);
+  const clear = usePasteState((s) => s.set);
+
+  useEffect(() => {
+    if (!pasted) return;
+    const timer = setTimeout(() => clear(null), 8000);
+    return () => clearTimeout(timer);
+  }, [pasted, clear]);
+
+  if (!pasted) return null;
+  const asImage = () => {
+    const store = useComposer.getState();
+    store.undo(); // revert the background change
+    const project = useComposer.getState().project;
+    if (project) store.addLayer(createImageLayer(project, pasted, 0.6));
+    clear(null);
+  };
+  return (
+    <div role="status" className="fade-in fixed inset-x-4 bottom-4 z-40 mx-auto flex max-w-md flex-wrap items-center gap-3 rounded-lg border border-edge bg-panel p-3 shadow-lg">
+      <span className="me-auto text-sm">{t('composer.pastedAsBackground')}</span>
+      <button onClick={asImage} className={`${buttonSecondary} py-1 text-sm`}>
+        {t('composer.useAsImage')}
+      </button>
+      <button onClick={() => clear(null)} aria-label={t('dialog.close')} className="px-1 text-slate-400 hover:text-white">
+        ✕
+      </button>
+    </div>
+  );
 }
 
 function useKeyboardShortcuts() {

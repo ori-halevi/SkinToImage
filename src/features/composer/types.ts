@@ -40,6 +40,8 @@ export interface ImageLayer extends BaseLayer {
   label: string;
   /** How a character image was rendered, so the editor can re-render it (swap characters, silhouettes). */
   source?: ShotSource;
+  /** Draw the whole image flat black, keeping its transparency. */
+  silhouette?: boolean;
 }
 
 export interface ShotSource {

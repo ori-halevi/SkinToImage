@@ -82,7 +82,15 @@ export const useStudio = create<StudioState>()(
           const all = [...s.skins.filter((k) => k.id !== skin.id), skin];
           // Over the limit: the oldest skins make room (and free their cached 3D models).
           for (const evicted of all.slice(0, -MAX_ACTIVE_SKINS)) forgetSkin(evicted.id);
-          return { skins: all.slice(-MAX_ACTIVE_SKINS), activeSkinId: skin.id, addSkinOpen: false };
+          // Swaps and manual picks pin each scene's cast to the skins that existed then; go back to
+          // automatic casting so the new skin shows up in every scene (led by the new active skin).
+          const isNew = !s.skins.some((k) => k.id === skin.id);
+          return {
+            skins: all.slice(-MAX_ACTIVE_SKINS),
+            activeSkinId: skin.id,
+            addSkinOpen: false,
+            sceneCast: isNew ? {} : s.sceneCast,
+          };
         });
       },
       removeSkin: (id) => {

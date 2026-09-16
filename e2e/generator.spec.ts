@@ -199,6 +199,44 @@ test('swap characters and black silhouettes', async ({ page }) => {
   await expect(silhouette).toHaveAttribute('aria-pressed', 'true');
 });
 
+test('a skin added after swapping still appears in scenes', async ({ page }) => {
+  await loadSample(page);
+  await page.getByRole('button', { name: 'Add skin' }).click();
+  await page.getByRole('dialog', { name: 'Add a skin' }).getByRole('button', { name: 'Try a sample skin' }).click();
+  await page.getByRole('tab', { name: 'Scenes' }).click();
+  await page.getByRole('button', { name: 'Swap characters' }).click();
+
+  // Add a third skin while on the Scenes tab.
+  await page.getByRole('button', { name: 'Add skin' }).click();
+  await page.getByRole('dialog', { name: 'Add a skin' }).getByRole('button', { name: 'Try a sample skin' }).click();
+  const newest = await page.getByRole('button', { name: /^Use explorer/ }).last();
+  await expect(newest).toHaveAttribute('aria-pressed', 'true');
+
+  await page.getByRole('button', { name: 'Open Squad of 3' }).click();
+  const slots = page.getByRole('dialog', { name: 'Squad of 3' }).getByRole('combobox');
+  const values = await Promise.all([0, 1, 2].map((i) => slots.nth(i).inputValue()));
+  expect(new Set(values).size).toBe(3); // all three skins are cast
+});
+
+test('editor: character picker has skins and camera settings', async ({ page }) => {
+  await loadSample(page);
+  await page.getByRole('button', { name: 'Editor', exact: true }).click();
+  await page.getByRole('button', { name: 'Add character' }).click();
+  const picker = page.getByRole('dialog', { name: 'Add character' });
+  await expect(picker.getByRole('button', { name: 'Add skin' })).toBeVisible();
+  await picker.getByRole('button', { name: 'Hero', exact: true }).click();
+  await expect(picker.getByRole('button', { name: 'Hero', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await picker.getByRole('button', { name: 'Add Wave' }).click();
+  await expect(picker).toBeHidden();
+
+  const layers = page.locator('section', { has: page.getByRole('heading', { name: 'Layers' }) }).locator('li');
+  await expect(layers).toHaveCount(1);
+  // Characters are blacked out per character (the whole-image toggle is for uploaded images).
+  const silhouette = page.getByRole('button', { name: /^Black silhouette for / });
+  await silhouette.click();
+  await expect(silhouette).toHaveAttribute('aria-pressed', 'true');
+});
+
 test('editor: paste an image from the clipboard as the background', async ({ page }) => {
   await page.goto('/#editor');
   await expect(page.getByRole('button', { name: 'Add character' })).toBeVisible();
@@ -210,6 +248,14 @@ test('editor: paste an image from the clipboard as the background', async ({ pag
     window.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data }));
   }, png);
   await expect(page.getByRole('button', { name: 'Image', exact: true })).toHaveAttribute('aria-pressed', 'true');
+
+  // ...or turn the paste into an image layer instead.
+  await page.getByRole('button', { name: 'Add as an image instead' }).click();
+  await expect(page.getByRole('button', { name: 'Image', exact: true })).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('section', { has: page.getByRole('heading', { name: 'Layers' }) }).locator('li')).toHaveCount(1);
+  const silhouette = page.getByRole('checkbox', { name: 'Black silhouette', exact: true });
+  await silhouette.check();
+  await expect(silhouette).toBeChecked();
 });
 
 test('rejects invalid files with a clear error', async ({ page }) => {

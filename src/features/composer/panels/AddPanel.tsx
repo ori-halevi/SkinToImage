@@ -44,6 +44,19 @@ export function AddPanel() {
           {t('composer.addImage')}
         </button>
       </div>
+      {canReadClipboard() && (
+        <button
+          onClick={async () => {
+            const image = await readClipboardImage();
+            if (!image) return;
+            const [assetId, size] = await Promise.all([saveAsset(image), assetSize(image)]);
+            addLayer(createImageLayer(useComposer.getState().project!, { assetId, label: t('composer.pastedImage'), ...size }, 0.6));
+          }}
+          className={`${buttonSecondary} text-sm`}
+        >
+          {t('composer.pasteAsImage')}
+        </button>
+      )}
       <input
         ref={imageInput}
         type="file"
@@ -105,7 +118,7 @@ export function AddPanel() {
                 }}
                 className={`${buttonSecondary} py-1 text-sm`}
               >
-                {t('studio.pasteImage')}
+                {t('composer.pasteAsBackground')}
               </button>
             )}
           </div>

@@ -287,8 +287,7 @@
     "addToEditor": "הוספה לעורך",
     "addNamed": "הוספת {{name}}",
     "pickerHint": "לפי הסקינים וההגדרות הנוכחיים",
-    "noSkins": "קודם צריך לטעון סקין במחולל.",
-    "goToGenerator": "מעבר למחולל",
+    "noSkins": "כדי להוסיף דמויות צריך לטעון סקין.",
     "properties": "השכבה שנבחרה",
     "nothingSelected": "לוחצים על משהו במשטח כדי לערוך אותו.",
     "text": "טקסט",
@@ -330,6 +329,12 @@
     "swapNeedsSkins": "כדי להחליף דמויות צריך לטעון עוד סקינים במחולל.",
     "makeEditableHint": "התמונה הזו נוספה לפני שהיה אפשר להחליף או להשחיר דמויות.",
     "makeEditable": "הפיכת הדמויות לניתנות לעריכה",
-    "swapNamed": "החלפת דמויות ב-{{name}}"
+    "swapNamed": "החלפת דמויות ב-{{name}}",
+    "imageSilhouette": "צללית שחורה",
+    "pastedAsBackground": "הודבק כרקע.",
+    "useAsImage": "להוסיף כתמונה במקום",
+    "pasteAsImage": "הדבקת תמונה",
+    "pasteAsBackground": "הדבקה כרקע",
+    "pastedImage": "תמונה מודבקת"
   }
 }

@@ -285,8 +285,7 @@
     "addToEditor": "Add to editor",
     "addNamed": "Add {{name}}",
     "pickerHint": "Uses your current skins and settings",
-    "noSkins": "Load a skin in the generator first.",
-    "goToGenerator": "Go to generator",
+    "noSkins": "Load a skin to add characters.",
     "properties": "Selected layer",
     "nothingSelected": "Click something on the canvas to edit it.",
     "text": "Text",
@@ -328,6 +327,12 @@
     "swapNeedsSkins": "Load more skins in the generator to swap characters.",
     "makeEditableHint": "This image was added before characters could be swapped or blacked out.",
     "makeEditable": "Make characters editable",
-    "swapNamed": "Swap characters in {{name}}"
+    "swapNamed": "Swap characters in {{name}}",
+    "imageSilhouette": "Black silhouette",
+    "pastedAsBackground": "Pasted as the background.",
+    "useAsImage": "Add as an image instead",
+    "pasteAsImage": "Paste image",
+    "pasteAsBackground": "Paste as background",
+    "pastedImage": "Pasted image"
   }
 }

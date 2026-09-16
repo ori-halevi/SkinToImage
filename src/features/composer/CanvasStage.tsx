@@ -170,10 +170,32 @@ export function CanvasStage({ maxHeight }: { maxHeight: number }) {
 
 type CommonProps = Konva.NodeConfig & Record<string, unknown>;
 
+/** Konva filter: every pixel black, alpha untouched. */
+function blackFilter(imageData: ImageData) {
+  const d = imageData.data;
+  for (let i = 0; i < d.length; i += 4) d[i] = d[i + 1] = d[i + 2] = 0;
+}
+
 function ImageNode({ layer, common }: { layer: ImageLayer; common: CommonProps }) {
   const image = useAssetImage(layer.assetId);
+  const ref = useRef<Konva.Image>(null);
+
+  // Filters only apply to cached nodes; cache at the image's natural size so exports stay sharp.
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    if (layer.silhouette) {
+      node.cache({ pixelRatio: 1 });
+      node.filters([blackFilter]);
+    } else {
+      node.filters([]);
+      node.clearCache();
+    }
+    node.getLayer()?.batchDraw();
+  }, [layer.silhouette, image]);
+
   if (!image) return null;
-  return <KonvaImage {...common} image={image} width={layer.width} height={layer.height} offsetX={layer.width / 2} offsetY={layer.height / 2} />;
+  return <KonvaImage ref={ref} {...common} image={image} width={layer.width} height={layer.height} offsetX={layer.width / 2} offsetY={layer.height / 2} />;
 }
 
 function TextNode({ layer, common, fontsReady }: { layer: TextLayer; common: CommonProps; fontsReady: boolean }) {

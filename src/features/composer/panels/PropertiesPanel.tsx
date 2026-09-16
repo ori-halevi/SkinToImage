@@ -34,6 +34,14 @@ function LayerProperties({ layer }: { layer: Layer }) {
       {layer.type === 'text' && <TextProperties layer={layer} />}
       {layer.type === 'image' && (layer.source ? <CharacterProperties key={layer.id} layer={layer} /> : <MakeEditable key={layer.id} layer={layer} />)}
 
+      {/* Character renders black out per character (keeping the outline); other images as a whole. */}
+      {layer.type === 'image' && !layer.source && (
+        <Toggle
+          label={t('composer.imageSilhouette')}
+          checked={!!layer.silhouette}
+          onChange={(silhouette) => updateLayer(layer.id, { silhouette })}
+        />
+      )}
       <Slider
         label={t('composer.opacity')}
         value={Math.round(layer.opacity * 100)}

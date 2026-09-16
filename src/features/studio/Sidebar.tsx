@@ -216,7 +216,7 @@ export function Sidebar({ skin }: { skin: Skin }) {
   );
 }
 
-function SkinsBar({ activeSkin }: { activeSkin: Skin }) {
+export function SkinsBar({ activeSkin }: { activeSkin: Skin }) {
   const { t } = useTranslation();
   const skins = useStudio((s) => s.skins);
   const setActiveSkin = useStudio((s) => s.setActiveSkin);
@@ -225,7 +225,7 @@ function SkinsBar({ activeSkin }: { activeSkin: Skin }) {
 
   return (
     <div>
-      <div className="mb-2 flex items-baseline justify-between text-sm">
+      <div className="mb-2 flex items-baseline justify-between gap-3 text-sm">
         <span className="font-semibold">{t('studio.skins')}</span>
         <span className="text-xs text-slate-500">{t('studio.maxSkins', { max: MAX_ACTIVE_SKINS })}</span>
       </div>

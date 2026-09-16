@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { navigate } from '../../../app/route';
-import { getCamera } from '../../../data/cameras';
+import { CAMERAS, getCamera } from '../../../data/cameras';
 import { POSES } from '../../../data/poses';
 import { SCENES } from '../../../data/scenes';
 import { useActiveSkin, useStudio } from '../../../store/studio';
-import { buttonPrimary, buttonSecondary, useAnimatedDialog } from '../../../ui/controls';
+import { buttonPrimary, buttonSecondary, Chips, useAnimatedDialog } from '../../../ui/controls';
+import { SkinSource } from '../../skins/SkinSource';
+import { SkinsBar } from '../../studio/Sidebar';
 import type { Skin } from '../../skins/types';
 import { shotName, useShotContext } from '../../studio/Gallery';
 import { addShotsToEditor } from '../../studio/editorBridge';
@@ -33,11 +34,9 @@ export function CharacterPicker({ onClose }: { onClose: () => void }) {
       {skin ? (
         <PickerGrid skin={skin} onPicked={requestClose} />
       ) : (
-        <div className="flex flex-col items-center gap-3 p-8 text-center">
-          <p className="text-slate-300">{t('composer.noSkins')}</p>
-          <button onClick={() => navigate('studio')} className={buttonPrimary}>
-            {t('composer.goToGenerator')}
-          </button>
+        <div className="flex max-h-[75vh] flex-col gap-3 overflow-y-auto p-4">
+          <p className="text-center text-slate-300">{t('composer.noSkins')}</p>
+          <SkinSource />
         </div>
       )}
     </dialog>
@@ -48,6 +47,7 @@ function PickerGrid({ skin, onPicked }: { skin: Skin; onPicked: () => void }) {
   const { t } = useTranslation();
   const ctx = editorSettings(useShotContext(skin));
   const cameraId = useStudio((s) => s.cameraId);
+  const setCamera = useStudio((s) => s.setCamera);
   const [mode, setMode] = useState<'pose' | 'scene'>('pose');
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -67,7 +67,14 @@ function PickerGrid({ skin, onPicked }: { skin: Skin; onPicked: () => void }) {
   };
 
   return (
-    <div className="flex max-h-[70vh] flex-col gap-3 p-4">
+    <div className="flex max-h-[75vh] flex-col gap-3 p-4">
+      <div className="grid gap-3 border-b border-edge pb-3 sm:grid-cols-[auto_1fr] sm:items-end">
+        <SkinsBar activeSkin={skin} />
+        <div className="flex flex-col gap-1.5 sm:items-end">
+          <span className="text-sm font-semibold">{t('studio.camera')}</span>
+          <Chips dir="ltr" label={t('studio.camera')} value={getCamera(cameraId).id} options={CAMERAS.map((c) => ({ value: c.id, label: t(`cameras.${c.id}`) }))} onChange={setCamera} />
+        </div>
+      </div>
       <div className="flex items-center gap-2">
         {(['pose', 'scene'] as const).map((m) => (
           <button key={m} onClick={() => setMode(m)} aria-pressed={mode === m} className={`${mode === m ? buttonPrimary : buttonSecondary} py-1 text-sm`}>
