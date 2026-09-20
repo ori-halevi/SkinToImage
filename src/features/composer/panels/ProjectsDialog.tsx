@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { buttonPrimary, buttonSecondary, useAnimatedDialog } from '../../../ui/controls';
-import { deleteProject, listProjects, saveProject } from '../storage';
+import { deleteProject, duplicateProject, listProjects, saveProject } from '../storage';
 import { useComposer } from '../store';
 import { CANVAS_PRESET_IDS, type CanvasPresetId, type Project } from '../types';
 
@@ -31,6 +31,12 @@ export function ProjectsDialog({ onClose }: { onClose: () => void }) {
 
   const create = () => {
     useComposer.getState().newProject(t('composer.untitled'), preset);
+    requestClose();
+  };
+
+  const duplicate = async (project: Project) => {
+    const copy = await duplicateProject(project, t('composer.copyOf', { name: project.name }).slice(0, 60));
+    useComposer.getState().openProject(copy);
     requestClose();
   };
 
@@ -82,7 +88,10 @@ export function ProjectsDialog({ onClose }: { onClose: () => void }) {
                 {project.width}×{project.height} · {date.format(project.updatedAt)}
               </div>
             </button>
-            <div className="flex justify-end px-2 pb-2">
+            <div className="flex justify-end gap-2 px-2 pb-2">
+              <button onClick={() => void duplicate(project)} className={`${buttonSecondary} px-2 py-0.5 text-xs`}>
+                {t('composer.duplicate')}
+              </button>
               <button onClick={() => void remove(project)} className={`${buttonSecondary} px-2 py-0.5 text-xs text-red-300`}>
                 {t('composer.delete')}
               </button>

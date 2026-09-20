@@ -5,6 +5,7 @@ import { FONT_IDS, FONTS } from '../fonts';
 import { useComposer } from '../store';
 import type { ImageLayer, Layer, TextLayer } from '../types';
 import { distinctSkins, inferSource, MissingSkinsError, rerenderLayer, swapLayerCast, toggleLayerSilhouette } from '../rerender';
+import { DEFAULT_GLOW } from '../docOps';
 import { useStudio } from '../../../store/studio';
 import { getRecentSkin } from '../../skins/recentSkins';
 
@@ -42,6 +43,7 @@ function LayerProperties({ layer }: { layer: Layer }) {
           onChange={(silhouette) => updateLayer(layer.id, { silhouette })}
         />
       )}
+      {layer.type === 'image' && <GlowProperties layer={layer} />}
       <Slider
         label={t('composer.opacity')}
         value={Math.round(layer.opacity * 100)}
@@ -241,4 +243,36 @@ function useSkinNames(ids: string[]): Record<string, string> {
     };
   }, [key, loaded]);
   return names;
+}
+
+/** Soft colored glow behind an image (e.g. a transparent PNG dropped in from the web). */
+function GlowProperties({ layer }: { layer: ImageLayer }) {
+  const { t } = useTranslation();
+  const updateLayer = useComposer.getState().updateLayer;
+  const glow = layer.glow ?? { ...DEFAULT_GLOW, enabled: false };
+  const set = (patch: Partial<typeof glow>, tag?: string) => updateLayer(layer.id, { glow: { ...glow, ...patch } }, tag);
+
+  return (
+    <>
+      <Toggle
+        label={t('composer.glow')}
+        checked={glow.enabled}
+        onChange={(enabled) => set({ enabled })}
+        onReset={layer.glow ? () => updateLayer(layer.id, { glow: undefined }) : undefined}
+      />
+      {glow.enabled && (
+        <div className="flex flex-col gap-3 ps-3">
+          <ColorInput label={t('composer.glowColor')} value={glow.color} onChange={(color) => set({ color }, 'glowColor')} />
+          <Slider label={t('composer.glowSize')} value={Math.round(glow.size)} min={4} max={160} onChange={(size) => set({ size }, 'glowSize')} />
+          <Slider
+            label={t('composer.glowStrength')}
+            value={Math.round(glow.strength * 100)}
+            min={10}
+            max={100}
+            onChange={(v) => set({ strength: v / 100 }, 'glowStrength')}
+          />
+        </div>
+      )}
+    </>
+  );
 }

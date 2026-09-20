@@ -179,6 +179,10 @@ function blackFilter(imageData: ImageData) {
 function ImageNode({ layer, common }: { layer: ImageLayer; common: CommonProps }) {
   const image = useAssetImage(layer.assetId);
   const ref = useRef<Konva.Image>(null);
+  // Shadows are drawn in the node's own space, so undo the layer's scale to keep the glow's
+  // size in canvas pixels.
+  const glowScale = (Math.abs(layer.scaleX) + Math.abs(layer.scaleY)) / 2 || 1;
+  const glow = layer.glow?.enabled ? layer.glow : null;
 
   // Filters only apply to cached nodes; cache at the image's natural size so exports stay sharp.
   useEffect(() => {
@@ -194,8 +198,24 @@ function ImageNode({ layer, common }: { layer: ImageLayer; common: CommonProps }
     node.getLayer()?.batchDraw();
   }, [layer.silhouette, image]);
 
+
   if (!image) return null;
-  return <KonvaImage ref={ref} {...common} image={image} width={layer.width} height={layer.height} offsetX={layer.width / 2} offsetY={layer.height / 2} />;
+  return (
+    <KonvaImage
+      ref={ref}
+      {...common}
+      image={image}
+      width={layer.width}
+      height={layer.height}
+      offsetX={layer.width / 2}
+      offsetY={layer.height / 2}
+      shadowEnabled={!!glow}
+      shadowColor={glow?.color}
+      shadowBlur={glow ? glow.size / glowScale : 0}
+      shadowOpacity={glow?.strength ?? 1}
+      shadowOffset={{ x: 0, y: 0 }}
+    />
+  );
 }
 
 function TextNode({ layer, common, fontsReady }: { layer: TextLayer; common: CommonProps; fontsReady: boolean }) {

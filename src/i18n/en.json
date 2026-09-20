@@ -333,6 +333,11 @@
     "useAsImage": "Add as an image instead",
     "pasteAsImage": "Paste image",
     "pasteAsBackground": "Paste as background",
-    "pastedImage": "Pasted image"
+    "pastedImage": "Pasted image",
+    "glow": "Glow",
+    "glowColor": "Glow color",
+    "glowSize": "Glow size",
+    "glowStrength": "Glow strength",
+    "copyOf": "{{name}} (copy)"
   }
 }

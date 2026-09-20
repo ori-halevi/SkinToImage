@@ -258,6 +258,33 @@ test('editor: paste an image from the clipboard as the background', async ({ pag
   await expect(silhouette).toBeChecked();
 });
 
+test('editor: glow on an uploaded image, and duplicating a project', async ({ page }) => {
+  await page.goto('/#editor');
+  await page.getByTestId('composer-image-input').setInputFiles('public/icon-512.png');
+  const layers = page.locator('section', { has: page.getByRole('heading', { name: 'Layers' }) }).locator('li');
+  await expect(layers).toHaveCount(1);
+
+  const glow = page.getByRole('checkbox', { name: 'Glow', exact: true });
+  await glow.check();
+  await expect(page.getByRole('slider', { name: /^Glow size/ })).toBeVisible();
+  await page.getByRole('slider', { name: /^Glow strength/ }).fill('60');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download PNG' }).click()]);
+  expect(pngSize(await readDownload(download))).toEqual([1280, 720]);
+
+  // Duplicating keeps the original and opens the copy.
+  await page.getByRole('textbox', { name: 'Project name' }).fill('Original');
+  await page.getByRole('textbox', { name: 'Project name' }).press('Enter');
+  await page.getByRole('button', { name: 'Projects' }).click();
+  const projects = page.getByRole('dialog', { name: 'Projects' });
+  await projects.getByRole('button', { name: 'Duplicate' }).first().click();
+  await expect(page.getByRole('textbox', { name: 'Project name' })).toHaveValue('Original (copy)');
+  await expect(layers).toHaveCount(1);
+
+  await page.getByRole('button', { name: 'Projects' }).click();
+  await expect(projects.getByRole('button', { name: /^Open Original$/ })).toBeVisible();
+  await expect(projects.getByRole('button', { name: /^Open Original \(copy\)$/ })).toBeVisible();
+});
+
 test('rejects invalid files with a clear error', async ({ page }) => {
   await page.getByTestId('skin-input').setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: Buffer.from([1, 2, 3]) });
   await expect(page.getByRole('alert')).toHaveText('Only PNG skin files are supported.');

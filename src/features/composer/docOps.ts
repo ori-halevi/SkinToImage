@@ -51,6 +51,8 @@ export function createTextLayer(doc: ComposerDoc, text: string): TextLayer {
   };
 }
 
+export const DEFAULT_GLOW = { enabled: true, color: '#ffd54a', size: 40, strength: 0.9 };
+
 export const addLayer = (doc: ComposerDoc, layer: Layer): ComposerDoc => ({ ...doc, layers: [...doc.layers, layer] });
 
 export function updateLayer(doc: ComposerDoc, id: string, patch: Partial<Layer>): ComposerDoc {

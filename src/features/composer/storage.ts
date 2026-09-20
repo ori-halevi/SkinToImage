@@ -65,6 +65,17 @@ export async function saveProject(project: Project): Promise<void> {
   }
 }
 
+/**
+ * Copies a project under a new name so the original stays untouched. Images are shared: they're
+ * only deleted once no project uses them.
+ */
+export async function duplicateProject(project: Project, name: string): Promise<Project> {
+  const now = Date.now();
+  const copy: Project = { ...project, id: crypto.randomUUID(), name, createdAt: now, updatedAt: now };
+  await saveProject(copy);
+  return copy;
+}
+
 export function projectAssetIds(project: Pick<Project, 'layers' | 'background'>): string[] {
   const ids = project.layers.flatMap((l) => (l.type === 'image' ? [l.assetId] : []));
   if (project.background.type === 'image') ids.push(project.background.imageId);

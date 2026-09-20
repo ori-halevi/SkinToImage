@@ -42,6 +42,8 @@ export interface ImageLayer extends BaseLayer {
   source?: ShotSource;
   /** Draw the whole image flat black, keeping its transparency. */
   silhouette?: boolean;
+  /** Soft colored glow behind the image (sizes are in canvas pixels). */
+  glow?: { enabled: boolean; color: string; size: number; strength: number };
 }
 
 export interface ShotSource {

@@ -335,6 +335,11 @@
     "useAsImage": "להוסיף כתמונה במקום",
     "pasteAsImage": "הדבקת תמונה",
     "pasteAsBackground": "הדבקה כרקע",
-    "pastedImage": "תמונה מודבקת"
+    "pastedImage": "תמונה מודבקת",
+    "glow": "זוהר",
+    "glowColor": "צבע הזוהר",
+    "glowSize": "גודל הזוהר",
+    "glowStrength": "עוצמת הזוהר",
+    "copyOf": "{{name}} (עותק)"
   }
 }
