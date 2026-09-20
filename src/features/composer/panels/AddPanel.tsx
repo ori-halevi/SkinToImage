@@ -57,6 +57,7 @@ export function AddPanel() {
           {t('composer.pasteAsImage')}
         </button>
       )}
+      <p className="text-xs text-slate-500">{t('composer.pasteHint')}</p>
       <input
         ref={imageInput}
         type="file"
@@ -122,7 +123,6 @@ export function AddPanel() {
               </button>
             )}
           </div>
-          <p className="text-xs text-slate-500">{t('composer.pasteHint')}</p>
         </div>
       </div>
 

@@ -237,7 +237,7 @@ test('editor: character picker has skins and camera settings', async ({ page }) 
   await expect(silhouette).toHaveAttribute('aria-pressed', 'true');
 });
 
-test('editor: paste an image from the clipboard as the background', async ({ page }) => {
+test('editor: paste an image from the clipboard', async ({ page }) => {
   await page.goto('/#editor');
   await expect(page.getByRole('button', { name: 'Add character' })).toBeVisible();
   const png = (await readFile('public/icon-512.png')).toString('base64');
@@ -247,15 +247,18 @@ test('editor: paste an image from the clipboard as the background', async ({ pag
     data.items.add(new File([blob], 'bg.png', { type: 'image/png' }));
     window.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data }));
   }, png);
-  await expect(page.getByRole('button', { name: 'Image', exact: true })).toHaveAttribute('aria-pressed', 'true');
 
-  // ...or turn the paste into an image layer instead.
-  await page.getByRole('button', { name: 'Add as an image instead' }).click();
-  await expect(page.getByRole('button', { name: 'Image', exact: true })).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('section', { has: page.getByRole('heading', { name: 'Layers' }) }).locator('li')).toHaveCount(1);
+  // Pasting adds an image layer...
+  const layers = page.locator('section', { has: page.getByRole('heading', { name: 'Layers' }) }).locator('li');
+  await expect(layers).toHaveCount(1);
   const silhouette = page.getByRole('checkbox', { name: 'Black silhouette', exact: true });
   await silhouette.check();
   await expect(silhouette).toBeChecked();
+
+  // ...or becomes the background instead.
+  await page.getByRole('button', { name: 'Use as the background instead' }).click();
+  await expect(layers).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Image', exact: true })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('editor: glow on an uploaded image, and duplicating a project', async ({ page }) => {

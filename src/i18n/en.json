@@ -321,7 +321,7 @@
       "square": "Square",
       "shorts": "Shorts / TikTok"
     },
-    "pasteHint": "Tip: copy an image anywhere and press Ctrl+V here to use it as the background.",
+    "pasteHint": "Tip: copy an image anywhere and press Ctrl+V here to add it.",
     "skinsMissing": "The skins for this image aren't available anymore. Load them again in the generator.",
     "selectCharacterHint": "Click a character on the canvas to swap who plays whom or black characters out.",
     "swapNeedsSkins": "Load more skins in the generator to swap characters.",
@@ -329,8 +329,6 @@
     "makeEditable": "Make characters editable",
     "swapNamed": "Swap characters in {{name}}",
     "imageSilhouette": "Black silhouette",
-    "pastedAsBackground": "Pasted as the background.",
-    "useAsImage": "Add as an image instead",
     "pasteAsImage": "Paste image",
     "pasteAsBackground": "Paste as background",
     "pastedImage": "Pasted image",
@@ -338,6 +336,8 @@
     "glowColor": "Glow color",
     "glowSize": "Glow size",
     "glowStrength": "Glow strength",
-    "copyOf": "{{name}} (copy)"
+    "copyOf": "{{name}} (copy)",
+    "pastedAsImage": "Pasted as an image.",
+    "useAsBackground": "Use as the background instead"
   }
 }

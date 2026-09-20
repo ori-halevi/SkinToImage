@@ -323,7 +323,7 @@
       "square": "ריבוע",
       "shorts": "שורטס / טיקטוק"
     },
-    "pasteHint": "טיפ: מעתיקים תמונה מכל מקום ולוחצים כאן Ctrl+V כדי שתהיה הרקע.",
+    "pasteHint": "טיפ: מעתיקים תמונה מכל מקום ולוחצים כאן Ctrl+V כדי להוסיף אותה.",
     "skinsMissing": "הסקינים של התמונה הזו כבר לא זמינים. צריך לטעון אותם שוב במחולל.",
     "selectCharacterHint": "לוחצים על דמות במשטח כדי להחליף מי משחק את מי או להשחיר דמויות.",
     "swapNeedsSkins": "כדי להחליף דמויות צריך לטעון עוד סקינים במחולל.",
@@ -331,8 +331,6 @@
     "makeEditable": "הפיכת הדמויות לניתנות לעריכה",
     "swapNamed": "החלפת דמויות ב-{{name}}",
     "imageSilhouette": "צללית שחורה",
-    "pastedAsBackground": "הודבק כרקע.",
-    "useAsImage": "להוסיף כתמונה במקום",
     "pasteAsImage": "הדבקת תמונה",
     "pasteAsBackground": "הדבקה כרקע",
     "pastedImage": "תמונה מודבקת",
@@ -340,6 +338,8 @@
     "glowColor": "צבע הזוהר",
     "glowSize": "גודל הזוהר",
     "glowStrength": "עוצמת הזוהר",
-    "copyOf": "{{name}} (עותק)"
+    "copyOf": "{{name}} (עותק)",
+    "pastedAsImage": "הודבק כתמונה.",
+    "useAsBackground": "להשתמש כרקע במקום"
   }
 }
