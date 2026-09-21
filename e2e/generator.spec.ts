@@ -3,7 +3,7 @@ import { unzipSync } from 'fflate';
 import { readFile } from 'node:fs/promises';
 
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47];
-const POSE_COUNT = 43;
+const POSE_COUNT = 64;
 const SCENE_COUNT = 33;
 
 async function readDownload(download: Download): Promise<Uint8Array> {

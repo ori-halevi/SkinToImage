@@ -1,0 +1,21 @@
+{
+  "id": "shrug",
+  "category": "emotion",
+  "bones": {
+    "head": [
+      0,
+      0,
+      12
+    ],
+    "rightArm": [
+      -25,
+      0,
+      -38
+    ],
+    "leftArm": [
+      -25,
+      0,
+      38
+    ]
+  }
+}

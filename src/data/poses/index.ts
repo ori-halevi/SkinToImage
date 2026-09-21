@@ -5,10 +5,12 @@ const modules = import.meta.glob<Pose>('./*.json', { eager: true, import: 'defau
 /** Gallery order: the most thumbnail-friendly poses first. Poses not listed are appended at the end. */
 const ORDER = [
   'wave', 'point', 'shocked', 'facepalm', 'victory', 'thinking', 'pointSide', 'scared',
-  'angry', 'laugh', 'cry', 'confused', 'sad', 'thumbsUp', 'flex', 'run',
-  'jump', 'punch', 'kick', 'swordSwing', 'guard', 'throw', 'aim', 'fly',
-  'walk', 'dab', 'floss', 'zombie', 'ninjaRun', 'handstand', 'chicken', 'tpose',
-  'stand', 'armsCrossed', 'handsBehind', 'cheer', 'salute', 'selfie', 'bow', 'crouch',
+  'angry', 'rage', 'laugh', 'cry', 'confused', 'shrug', 'heartHands', 'please', 'sad', 'bored',
+  'thumbsUp', 'flex', 'pointUp', 'pointDown', 'shh', 'lookFar', 'cool',
+  'run', 'sprint', 'jump', 'jumpKick', 'punch', 'kick', 'swordSwing', 'guard', 'throw', 'aim', 'fly',
+  'sneak', 'climb', 'walk',
+  'dab', 'floss', 'disco', 'zombie', 'ninjaRun', 'moonwalk', 'dizzy', 'airplane', 'penguin', 'handstand', 'chicken', 'tpose',
+  'stand', 'armsCrossed', 'handsBehind', 'cheer', 'salute', 'pray', 'stretch', 'selfie', 'bow', 'crouch',
   'sit', 'sitGround', 'fall',
 ];
 

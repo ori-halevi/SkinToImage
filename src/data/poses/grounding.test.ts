@@ -17,7 +17,7 @@ function lowestPoint(poseId: string): number {
 }
 
 /** Poses that are airborne or lift a leg on purpose. */
-const AIRBORNE = new Set(['fly', 'jump', 'fall', 'run', 'ninjaRun', 'kick', 'chicken', 'cheer']);
+const AIRBORNE = new Set(['fly', 'jump', 'fall', 'run', 'ninjaRun', 'kick', 'chicken', 'cheer', 'sprint', 'jumpKick', 'climb']);
 
 describe('pose grounding', () => {
   it.each(POSES.filter((p) => !AIRBORNE.has(p.id)).map((p) => p.id))('%s touches the ground without sinking into it', (id) => {

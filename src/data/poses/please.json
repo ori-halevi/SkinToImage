@@ -1,0 +1,26 @@
+{
+  "id": "please",
+  "category": "emotion",
+  "bones": {
+    "head": [
+      -15,
+      0,
+      0
+    ],
+    "body": [
+      15,
+      0,
+      0
+    ],
+    "rightArm": [
+      -70,
+      0,
+      20
+    ],
+    "leftArm": [
+      -70,
+      0,
+      -20
+    ]
+  }
+}

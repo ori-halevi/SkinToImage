@@ -10,6 +10,13 @@ export function presetDirection(preset: CameraPreset): Vector3 {
   return new Vector3(Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
 }
 
+/** Looks at `target` from the camera's position, tilted by `roll` degrees around the viewing axis. */
+function aim(camera: PerspectiveCamera, target: Vector3, dir: Vector3, roll = 0): void {
+  // Rotating clockwise on screen = rotating "up" around the axis pointing from target to camera.
+  camera.up.set(0, 1, 0).applyAxisAngle(dir.clone().normalize(), -MathUtils.degToRad(roll));
+  camera.lookAt(target);
+}
+
 /**
  * Positions a square-aspect camera along the preset direction so that every mesh vertex
  * fits inside the central `fill` fraction of the frame, as tightly as possible.
@@ -40,7 +47,7 @@ export function fitCamera(camera: PerspectiveCamera, preset: CameraPreset, meshe
   // Refine: re-center on the projected bounds and scale distance until the silhouette fills the frame.
   for (let iter = 0; iter < 6; iter++) {
     camera.position.copy(target).addScaledVector(dir, distance);
-    camera.lookAt(target);
+    aim(camera, target, dir, preset.roll);
     camera.updateMatrixWorld();
     camera.updateProjectionMatrix();
 
@@ -65,7 +72,7 @@ export function fitCamera(camera: PerspectiveCamera, preset: CameraPreset, meshe
   }
 
   camera.position.copy(target).addScaledVector(dir, distance);
-  camera.lookAt(target);
+  aim(camera, target, dir, preset.roll);
   camera.updateMatrixWorld();
   camera.updateProjectionMatrix();
 }

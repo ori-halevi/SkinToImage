@@ -1,0 +1,36 @@
+{
+  "id": "dizzy",
+  "category": "funny",
+  "bones": {
+    "head": [
+      0,
+      0,
+      25
+    ],
+    "body": [
+      0,
+      0,
+      -12
+    ],
+    "rightArm": [
+      0,
+      0,
+      -70
+    ],
+    "leftArm": [
+      0,
+      0,
+      40
+    ],
+    "rightLeg": [
+      0,
+      0,
+      -8
+    ],
+    "leftLeg": [
+      0,
+      0,
+      10
+    ]
+  }
+}

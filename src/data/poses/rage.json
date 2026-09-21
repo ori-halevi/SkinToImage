@@ -1,0 +1,36 @@
+{
+  "id": "rage",
+  "category": "emotion",
+  "bones": {
+    "head": [
+      -20,
+      0,
+      0
+    ],
+    "body": [
+      8,
+      0,
+      0
+    ],
+    "rightArm": [
+      -150,
+      0,
+      -25
+    ],
+    "leftArm": [
+      -150,
+      0,
+      25
+    ],
+    "rightLeg": [
+      0,
+      0,
+      -7
+    ],
+    "leftLeg": [
+      0,
+      0,
+      7
+    ]
+  }
+}

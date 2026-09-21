@@ -1,0 +1,31 @@
+{
+  "id": "climb",
+  "category": "action",
+  "bones": {
+    "head": [
+      -20,
+      0,
+      0
+    ],
+    "rightArm": [
+      -170,
+      0,
+      -10
+    ],
+    "leftArm": [
+      -60,
+      0,
+      5
+    ],
+    "rightLeg": [
+      -60,
+      0,
+      0
+    ],
+    "leftLeg": [
+      10,
+      0,
+      0
+    ]
+  }
+}

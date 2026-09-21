@@ -1,0 +1,21 @@
+{
+  "id": "shh",
+  "category": "casual",
+  "bones": {
+    "head": [
+      5,
+      0,
+      0
+    ],
+    "rightArm": [
+      -125,
+      0,
+      40
+    ],
+    "leftArm": [
+      0,
+      0,
+      5
+    ]
+  }
+}

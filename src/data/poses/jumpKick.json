@@ -1,0 +1,38 @@
+{
+  "id": "jumpKick",
+  "category": "action",
+  "bones": {
+    "body": [
+      -15,
+      0,
+      0
+    ],
+    "rightArm": [
+      -40,
+      0,
+      -60
+    ],
+    "leftArm": [
+      30,
+      0,
+      50
+    ],
+    "rightLeg": [
+      -90,
+      0,
+      0
+    ],
+    "leftLeg": [
+      40,
+      0,
+      0
+    ]
+  },
+  "root": {
+    "position": [
+      0,
+      6,
+      0
+    ]
+  }
+}

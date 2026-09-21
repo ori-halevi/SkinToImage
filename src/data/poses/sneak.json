@@ -1,0 +1,36 @@
+{
+  "id": "sneak",
+  "category": "action",
+  "bones": {
+    "head": [
+      -10,
+      0,
+      0
+    ],
+    "body": [
+      15,
+      0,
+      0
+    ],
+    "rightArm": [
+      -40,
+      0,
+      -10
+    ],
+    "leftArm": [
+      -40,
+      0,
+      10
+    ],
+    "rightLeg": [
+      -25,
+      0,
+      0
+    ],
+    "leftLeg": [
+      15,
+      0,
+      0
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "pointUp",
+  "category": "casual",
+  "bones": {
+    "head": [
+      -25,
+      0,
+      0
+    ],
+    "rightArm": [
+      -170,
+      0,
+      -5
+    ],
+    "leftArm": [
+      0,
+      0,
+      5
+    ]
+  }
+}

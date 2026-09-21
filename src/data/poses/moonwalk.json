@@ -1,0 +1,36 @@
+{
+  "id": "moonwalk",
+  "category": "funny",
+  "bones": {
+    "head": [
+      5,
+      0,
+      0
+    ],
+    "body": [
+      -10,
+      0,
+      0
+    ],
+    "rightArm": [
+      30,
+      0,
+      -10
+    ],
+    "leftArm": [
+      -20,
+      0,
+      10
+    ],
+    "rightLeg": [
+      -15,
+      0,
+      0
+    ],
+    "leftLeg": [
+      20,
+      0,
+      0
+    ]
+  }
+}

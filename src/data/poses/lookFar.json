@@ -1,0 +1,21 @@
+{
+  "id": "lookFar",
+  "category": "casual",
+  "bones": {
+    "head": [
+      -30,
+      -10,
+      0
+    ],
+    "rightArm": [
+      -150,
+      0,
+      40
+    ],
+    "leftArm": [
+      0,
+      0,
+      5
+    ]
+  }
+}

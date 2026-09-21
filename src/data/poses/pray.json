@@ -1,0 +1,21 @@
+{
+  "id": "pray",
+  "category": "casual",
+  "bones": {
+    "head": [
+      15,
+      0,
+      0
+    ],
+    "rightArm": [
+      -60,
+      0,
+      25
+    ],
+    "leftArm": [
+      -60,
+      0,
+      -25
+    ]
+  }
+}

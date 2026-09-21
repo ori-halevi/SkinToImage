@@ -1,0 +1,26 @@
+{
+  "id": "bored",
+  "category": "emotion",
+  "bones": {
+    "head": [
+      10,
+      0,
+      20
+    ],
+    "body": [
+      0,
+      0,
+      6
+    ],
+    "rightArm": [
+      5,
+      0,
+      -3
+    ],
+    "leftArm": [
+      5,
+      0,
+      3
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "pointDown",
+  "category": "casual",
+  "bones": {
+    "head": [
+      25,
+      0,
+      0
+    ],
+    "body": [
+      5,
+      0,
+      0
+    ],
+    "rightArm": [
+      -40,
+      0,
+      -10
+    ],
+    "leftArm": [
+      0,
+      0,
+      5
+    ]
+  }
+}

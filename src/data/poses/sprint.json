@@ -1,0 +1,36 @@
+{
+  "id": "sprint",
+  "category": "action",
+  "bones": {
+    "head": [
+      -20,
+      0,
+      0
+    ],
+    "body": [
+      25,
+      0,
+      0
+    ],
+    "rightArm": [
+      80,
+      0,
+      0
+    ],
+    "leftArm": [
+      -90,
+      0,
+      0
+    ],
+    "rightLeg": [
+      -70,
+      0,
+      0
+    ],
+    "leftLeg": [
+      50,
+      0,
+      0
+    ]
+  }
+}
