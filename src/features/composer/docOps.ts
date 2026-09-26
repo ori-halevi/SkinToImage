@@ -1,4 +1,4 @@
-import { CANVAS_PRESETS, type CanvasPresetId, type ComposerDoc, type ImageLayer, type Layer, type TextLayer } from './types';
+import { CANVAS_PRESETS, type Border, type CanvasPresetId, type ComposerDoc, type ImageLayer, type Layer, type TextLayer } from './types';
 
 const newId = () => crypto.randomUUID();
 
@@ -51,6 +51,8 @@ export function createTextLayer(doc: ComposerDoc, text: string): TextLayer {
   };
 }
 
+export const DEFAULT_BORDER: Border = { enabled: true, color: '#ffffff', width: 16 };
+
 export const DEFAULT_GLOW = { enabled: true, color: '#ffd54a', size: 40, strength: 0.9 };
 
 export const addLayer = (doc: ComposerDoc, layer: Layer): ComposerDoc => ({ ...doc, layers: [...doc.layers, layer] });
@@ -93,13 +95,14 @@ export function resizeCanvas(doc: ComposerDoc, preset: CanvasPresetId): Composer
   const sx = width / doc.width;
   const sy = height / doc.height;
   const s = Math.min(sx, sy);
+  const border = doc.border ? { ...doc.border, width: doc.border.width * s } : undefined;
   const layers = doc.layers.map((l): Layer => {
     const moved = { ...l, x: l.x * sx, y: l.y * sy };
     return l.type === 'text'
       ? { ...(moved as TextLayer), fontSize: l.fontSize * s, strokeWidth: l.strokeWidth * s }
       : { ...(moved as ImageLayer), scaleX: l.scaleX * s, scaleY: l.scaleY * s };
   });
-  return { ...doc, width, height, layers };
+  return { ...doc, width, height, border, layers };
 }
 
 /** Folds a transform's scale into font size for text, so strokes stay proportional and crisp. */

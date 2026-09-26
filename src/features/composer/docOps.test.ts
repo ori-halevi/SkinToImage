@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   addLayer,
+  DEFAULT_BORDER,
   bakeTextScale,
   createImageLayer,
   createTextLayer,
@@ -70,6 +71,13 @@ describe('resizeCanvas', () => {
     expect(img.y).toBeCloseTo(960);
     expect(img.scaleX).toBeCloseTo(image.scaleX * (1080 / 1280));
     expect(txt.type === 'text' && txt.fontSize).toBeCloseTo(text.fontSize * (1080 / 1280));
+  });
+});
+
+describe('border', () => {
+  it('scales with the canvas', () => {
+    const doc = { ...emptyDoc('youtube'), border: DEFAULT_BORDER };
+    expect(resizeCanvas(doc, 'shorts').border!.width).toBeCloseTo(DEFAULT_BORDER.width * (1080 / 1280));
   });
 });
 

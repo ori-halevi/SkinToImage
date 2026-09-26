@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Image as KonvaImage, Layer as KonvaLayer, Line, Stage, Text as KonvaText, Transformer } from 'react-konva';
+import { Image as KonvaImage, Layer as KonvaLayer, Line, Rect, Stage, Text as KonvaText, Transformer } from 'react-konva';
 import { paintBackground } from '../../render/postprocess/frame';
 import { bakeTextScale } from './docOps';
 import { FONTS, loadFonts } from './fonts';
@@ -146,6 +146,17 @@ export function CanvasStage({ maxHeight }: { maxHeight: number }) {
             ) : (
               <TextNode key={layer.id} layer={layer} common={common(layer)} fontsReady={fontsReady} />
             ),
+          )}
+          {project.border?.enabled && project.border.width > 0 && (
+            <Rect
+              listening={false}
+              x={project.border.width / 2}
+              y={project.border.width / 2}
+              width={width - project.border.width}
+              height={height - project.border.width}
+              stroke={project.border.color}
+              strokeWidth={project.border.width}
+            />
           )}
         </KonvaLayer>
         <KonvaLayer name="editor-ui">

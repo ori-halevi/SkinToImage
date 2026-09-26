@@ -365,6 +365,9 @@
     "glowStrength": "עוצמת הזוהר",
     "copyOf": "{{name}} (עותק)",
     "pastedAsImage": "הודבק כתמונה.",
-    "useAsBackground": "להשתמש כרקע במקום"
+    "useAsBackground": "להשתמש כרקע במקום",
+    "border": "מסגרת",
+    "borderColor": "צבע המסגרת",
+    "borderWidth": "עובי המסגרת"
   }
 }

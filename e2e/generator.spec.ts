@@ -288,6 +288,26 @@ test('editor: glow on an uploaded image, and duplicating a project', async ({ pa
   await expect(projects.getByRole('button', { name: /^Open Original \(copy\)$/ })).toBeVisible();
 });
 
+test('editor: border and a new project from the toolbar', async ({ page }) => {
+  await page.goto('/#editor');
+  await page.getByRole('textbox', { name: 'Project name' }).fill('With border');
+  await page.getByRole('textbox', { name: 'Project name' }).press('Enter');
+  await page.getByTestId('composer-image-input').setInputFiles('public/icon-512.png');
+
+  const border = page.getByRole('checkbox', { name: 'Border', exact: true });
+  await border.check();
+  await page.getByRole('slider', { name: /^Border width/ }).fill('40');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download PNG' }).click()]);
+  expect(pngSize(await readDownload(download))).toEqual([1280, 720]);
+
+  // "New project" starts a clean canvas without touching the saved one.
+  await page.getByRole('button', { name: 'New project' }).click();
+  await expect(page.locator('section', { has: page.getByRole('heading', { name: 'Layers' }) }).locator('li')).toHaveCount(0);
+  await expect(border).not.toBeChecked();
+  await page.getByRole('button', { name: 'Projects' }).click();
+  await expect(page.getByRole('dialog', { name: 'Projects' }).getByRole('button', { name: /^Open With border$/ })).toBeVisible();
+});
+
 test('rejects invalid files with a clear error', async ({ page }) => {
   await page.getByTestId('skin-input').setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: Buffer.from([1, 2, 3]) });
   await expect(page.getByRole('alert')).toHaveText('Only PNG skin files are supported.');

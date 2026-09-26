@@ -70,10 +70,18 @@ export interface TextLayer extends BaseLayer {
 export type Layer = ImageLayer | TextLayer;
 
 /** Everything that undo/redo tracks. */
+export interface Border {
+  enabled: boolean;
+  color: string;
+  /** Thickness in canvas pixels, drawn inside the canvas edges. */
+  width: number;
+}
+
 export interface ComposerDoc {
   width: number;
   height: number;
   background: Background;
+  border?: Border;
   /** Bottom to top. */
   layers: Layer[];
 }

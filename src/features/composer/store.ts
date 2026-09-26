@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { Background } from '../../render/postprocess/frame';
 import * as ops from './docOps';
 import { saveProject } from './storage';
-import type { CanvasPresetId, ComposerDoc, Layer, Project } from './types';
+import type { Border, CanvasPresetId, ComposerDoc, Layer, Project } from './types';
 
 interface ComposerState {
   project: Project | null;
@@ -22,6 +22,7 @@ interface ComposerState {
   duplicateLayer: (id: string) => void;
   reorderLayer: (id: string, move: ops.ReorderMove) => void;
   setBackground: (background: Background) => void;
+  setBorder: (border: Border | undefined) => void;
   resizeCanvas: (preset: CanvasPresetId) => void;
   undo: () => void;
   redo: () => void;
@@ -74,6 +75,7 @@ export const useComposer = create<ComposerState>()((set, get) => ({
   },
   reorderLayer: (id, move) => get().edit((doc) => ops.reorderLayer(doc, id, move)),
   setBackground: (background) => get().edit((doc) => ({ ...doc, background }), 'background'),
+  setBorder: (border) => get().edit((doc) => ({ ...doc, border }), 'border'),
   resizeCanvas: (preset) => get().edit((doc) => ops.resizeCanvas(doc, preset)),
 
   undo: () => {
@@ -102,8 +104,11 @@ export const useComposer = create<ComposerState>()((set, get) => ({
 // Autosave the open project shortly after it changes.
 let saveTimer: ReturnType<typeof setTimeout> | undefined;
 useComposer.subscribe((state, previous) => {
-  if (!state.project || state.project === previous.project) return;
+  if (state.project === previous.project) return;
   clearTimeout(saveTimer);
+  // Switching projects: write the one being left out now, so its pending edits aren't lost.
+  if (previous.project && previous.project.id !== state.project?.id) void saveProject(previous.project);
   const project = state.project;
-  saveTimer = setTimeout(() => void saveProject(useComposer.getState().project ?? project), 600);
+  if (!project) return;
+  saveTimer = setTimeout(() => void saveProject(project), 600);
 });

@@ -363,6 +363,9 @@
     "glowStrength": "Glow strength",
     "copyOf": "{{name}} (copy)",
     "pastedAsImage": "Pasted as an image.",
-    "useAsBackground": "Use as the background instead"
+    "useAsBackground": "Use as the background instead",
+    "border": "Border",
+    "borderColor": "Border color",
+    "borderWidth": "Border width"
   }
 }

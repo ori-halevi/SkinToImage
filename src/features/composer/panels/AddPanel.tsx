@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Background } from '../../../render/postprocess/frame';
-import { buttonPrimary, buttonSecondary, Chips, ColorInput, Field } from '../../../ui/controls';
-import { createImageLayer, createTextLayer } from '../docOps';
+import { buttonPrimary, buttonSecondary, Chips, ColorInput, Field, Slider, Toggle } from '../../../ui/controls';
+import { createImageLayer, createTextLayer, DEFAULT_BORDER } from '../docOps';
 import { assetSize, saveAsset } from '../storage';
 import { useComposer } from '../store';
 import { CharacterPicker } from './CharacterPicker';
@@ -18,7 +18,7 @@ const BACKGROUNDS: Record<Exclude<Background['type'], 'image'>, Background> = {
 export function AddPanel() {
   const { t } = useTranslation();
   const project = useComposer((s) => s.project)!;
-  const { addLayer, setBackground } = useComposer.getState();
+  const { addLayer, setBackground, setBorder } = useComposer.getState();
   const [pickerOpen, setPickerOpen] = useState(false);
   const imageInput = useRef<HTMLInputElement>(null);
   const backgroundInput = useRef<HTMLInputElement>(null);
@@ -124,6 +124,27 @@ export function AddPanel() {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="flex flex-col gap-2 border-t border-edge pt-4">
+        <Toggle
+          label={t('composer.border')}
+          checked={!!project.border?.enabled}
+          onChange={(enabled) => setBorder({ ...DEFAULT_BORDER, ...project.border, enabled })}
+          onReset={project.border ? () => setBorder(undefined) : undefined}
+        />
+        {project.border?.enabled && (
+          <div className="flex flex-col gap-2 ps-3">
+            <ColorInput label={t('composer.borderColor')} value={project.border.color} onChange={(color) => setBorder({ ...project.border!, color })} />
+            <Slider
+              label={t('composer.borderWidth')}
+              value={Math.round(project.border.width)}
+              min={2}
+              max={80}
+              onChange={(width) => setBorder({ ...project.border!, width })}
+            />
+          </div>
+        )}
       </div>
 
       {pickerOpen && <CharacterPicker onClose={() => setPickerOpen(false)} />}

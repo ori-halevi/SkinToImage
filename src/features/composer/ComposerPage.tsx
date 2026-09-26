@@ -79,6 +79,12 @@ function Editor() {
         <button onClick={() => setProjectsOpen(true)} className={`${buttonSecondary} py-1 text-sm`}>
           {t('composer.projects')}
         </button>
+        <button
+          onClick={() => useComposer.getState().newProject(t('composer.untitled'), presetFor(project.width, project.height) ?? 'youtube')}
+          className={`${buttonSecondary} py-1 text-sm`}
+        >
+          {t('composer.newProject')}
+        </button>
         <select
           aria-label={t('composer.canvasSize')}
           value={preset ?? ''}
