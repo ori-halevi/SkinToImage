@@ -1,3 +1,18 @@
+/** Local YYYYMMDD-HHMMSS, so repeated downloads never collide in the downloads folder. */
+export function timestamp(date = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const d = [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join('');
+  const t = [pad(date.getHours()), pad(date.getMinutes()), pad(date.getSeconds())].join('');
+  return `${d}-${t}`;
+}
+
+/** "name.png" -> "name_20260926-143012.png". */
+export function stampedFilename(filename: string): string {
+  const dot = filename.lastIndexOf('.');
+  const [base, ext] = dot > 0 ? [filename.slice(0, dot), filename.slice(dot)] : [filename, ''];
+  return `${base}_${timestamp()}${ext}`;
+}
+
 export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

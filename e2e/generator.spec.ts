@@ -37,7 +37,7 @@ test('sample skin → gallery → ZIP download', async ({ page }) => {
   await page.getByRole('button', { name: 'Export', exact: true }).click();
   await page.getByRole('button', { name: '1024px', exact: true }).click();
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download ZIP' }).click()]);
-  expect(download.suggestedFilename()).toBe('explorer_images.zip');
+  expect(download.suggestedFilename()).toMatch(/^explorer_images_\d{8}-\d{6}\.zip$/);
 
   const files = unzipSync(await readDownload(download));
   expect(Object.keys(files).sort()).toEqual(['explorer_dab_left.png', 'explorer_wave_left.png']);
@@ -59,7 +59,7 @@ test('single image download from the dialog', async ({ page }) => {
   await dialog.getByRole('button', { name: 'Front', exact: true }).click();
 
   const [download] = await Promise.all([page.waitForEvent('download'), dialog.getByRole('button', { name: 'Download PNG' }).click()]);
-  expect(download.suggestedFilename()).toBe('explorer_shocked_front.png');
+  expect(download.suggestedFilename()).toMatch(/^explorer_shocked_front_\d{8}-\d{6}\.png$/);
 
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
@@ -93,7 +93,7 @@ test('scenes with two skins', async ({ page }) => {
   const dialog = page.getByRole('dialog', { name: 'Sword fight' });
   await expect(dialog.getByText('Characters')).toBeVisible();
   const [download] = await Promise.all([page.waitForEvent('download'), dialog.getByRole('button', { name: 'Download PNG' }).click()]);
-  expect(download.suggestedFilename()).toBe('explorer_fight_left.png');
+  expect(download.suggestedFilename()).toMatch(/^explorer_fight_left_\d{8}-\d{6}\.png$/);
   const [width, height] = pngSize(await readDownload(download));
   // A real 2048px render of two characters, not a blank or single-character image.
   expect(width).toBeGreaterThan(900);

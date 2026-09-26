@@ -6,7 +6,7 @@ import { getScene, SCENES } from '../../data/scenes';
 import { renderKey, renderShot } from '../../render/renderShot';
 import { useStudio } from '../../store/studio';
 import { buttonPrimary, buttonSecondary, Chips, useAnimatedDialog } from '../../ui/controls';
-import { canCopyImage, canShareFiles, copyImage, downloadBlob, shareImage } from '../export/exportImage';
+import { canCopyImage, canShareFiles, copyImage, downloadBlob, shareImage, stampedFilename } from '../export/exportImage';
 import type { Skin } from '../skins/types';
 import { shotName, useShotContext } from './Gallery';
 import { addShotsToEditor } from './editorBridge';
@@ -154,7 +154,7 @@ export function ShotDialog({ skin, shot }: { skin: Skin; shot: ShotRef }) {
         )}
 
         <div className="flex flex-wrap items-center gap-2">
-          <button disabled={busy} className={buttonPrimary} onClick={() => run(async () => downloadBlob(await renderExport(), filename), t('dialog.downloaded'))}>
+          <button disabled={busy} className={buttonPrimary} onClick={() => run(async () => downloadBlob(await renderExport(), stampedFilename(filename)), t('dialog.downloaded'))}>
             {t('dialog.download')}
           </button>
           {canCopyImage() && (

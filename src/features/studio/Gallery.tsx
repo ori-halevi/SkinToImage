@@ -7,7 +7,7 @@ import { renderShot } from '../../render/renderShot';
 import { isAbortError } from '../../render/renderer';
 import { useStudio } from '../../store/studio';
 import { buttonPrimary, buttonSecondary } from '../../ui/controls';
-import { downloadBlob } from '../export/exportImage';
+import { downloadBlob, stampedFilename } from '../export/exportImage';
 import { buildZip, type ZipEntry } from '../export/zip';
 import type { Skin } from '../skins/types';
 import { buildShot, parseShotKey, shotFilename, shotKey, type ShotContext, type ShotRef } from './shots';
@@ -186,7 +186,7 @@ function SelectionBar({ skin, visible }: { skin: Skin; visible: ShotRef[] }) {
         setProgress({ done: i + 1, total: shots.length });
       }
       if (controller.signal.aborted) return;
-      downloadBlob(buildZip(entries), `${skin.name}_images.zip`);
+      downloadBlob(buildZip(entries), stampedFilename(`${skin.name}_images.zip`));
     } catch (e) {
       if (!isAbortError(e)) {
         console.error(e);

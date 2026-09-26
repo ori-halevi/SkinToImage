@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { downloadBlob } from '../export/exportImage';
+import { downloadBlob, stampedFilename } from '../export/exportImage';
 import { buttonPrimary, buttonSecondary } from '../../ui/controls';
 import { useMediaQuery } from '../../ui/useMediaQuery';
 import { ensureProject } from './addToEditor';
@@ -59,7 +59,7 @@ function Editor() {
       await new Promise((r) => requestAnimationFrame(r));
       const blob = await exportStage(format, project.width);
       const safeName = project.name.trim().replace(/[^\p{L}\p{N}_-]+/gu, '_') || 'thumbnail';
-      downloadBlob(blob, `${safeName}.${format === 'jpeg' ? 'jpg' : 'png'}`);
+      downloadBlob(blob, stampedFilename(`${safeName}.${format === 'jpeg' ? 'jpg' : 'png'}`));
     } finally {
       setExporting(null);
     }
